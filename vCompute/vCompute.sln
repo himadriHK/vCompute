@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vComputeServer", "vComputeS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vComputeClient", "vComputeClient\vComputeClient.csproj", "{B57DA644-BE4F-4EA5-B8C7-AB3C140EDB49}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommAPI", "CommAPI\CommAPI.csproj", "{73AB48E0-98BA-4165-B058-8D1BBB096432}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{B57DA644-BE4F-4EA5-B8C7-AB3C140EDB49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B57DA644-BE4F-4EA5-B8C7-AB3C140EDB49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B57DA644-BE4F-4EA5-B8C7-AB3C140EDB49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73AB48E0-98BA-4165-B058-8D1BBB096432}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73AB48E0-98BA-4165-B058-8D1BBB096432}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73AB48E0-98BA-4165-B058-8D1BBB096432}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73AB48E0-98BA-4165-B058-8D1BBB096432}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
