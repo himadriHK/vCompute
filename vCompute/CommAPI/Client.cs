@@ -17,7 +17,6 @@ namespace CommAPI
 		private string hostAddress;
 		private int port;
 		private TcpClient clientInstance;
-		private Loader codeLoader;
 		private NetworkStream networkDataStream;
 		private Common commUtil;
 
@@ -27,25 +26,24 @@ namespace CommAPI
 			this.port = port;
 			clientId = clientKey;
 			clientInstance = new TcpClient();
-			//Loader codeLoader = new Loader(swapFilePath);
-			commUtil = new Common();
-			//try
-			//{
-				clientInstance.Connect(hostAddress, port);
-				if(clientInstance.Connected)
-				{
-					Console.WriteLine("Client Connected");
-					networkDataStream = clientInstance.GetStream();
-					Thread pingThread = new Thread(pingHandler);
-					//Thread dispatcher = new Thread(commandHandler);
-					pingThread.Start();
-					//dispatcher.Start();
-				}
-			//}
-			//catch(Exception ex)
-			//{
-			//
-			//}
+			commUtil = new Common(swapFilePath);
+			try
+			{
+			clientInstance.Connect(hostAddress, port);
+			if(clientInstance.Connected)
+			
+			Console.WriteLine("Client Connected");
+			networkDataStream = clientInstance.GetStream();
+			Thread pingThread = new Thread(pingHandler);
+			//Thread dispatcher = new Thread(commandHandler);
+			pingThread.Start();
+			//dispatcher.Start();
+			
+			}
+			catch(Exception ex)
+			{
+			
+			}
 		}
 
 		private void commandHandler()

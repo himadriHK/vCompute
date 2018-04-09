@@ -4,6 +4,8 @@ using System.Web.Script.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
+using System.Reflection;
+using CodeLoader;
 
 namespace CommAPI
 {
@@ -12,6 +14,43 @@ namespace CommAPI
 	{
 		
 		private const int payloadSize = 1024;
+		public Loader codeLoader;
+
+		public Common(string codeBinaryFilePath)
+		{
+			codeLoader = new Loader(codeBinaryFilePath);
+		}
+
+		public string executeAssembly(string assemblyName,object param)
+		{
+			byte[] assemblyBinary = codeLoader.codeDictionary.readAssembly(assemblyName);
+			Assembly asm = Assembly.Load(assemblyBinary);
+			CodeInterface assemblyObj = null;
+
+			foreach (Type t in asm.GetTypes())
+				if (t.GetInterface("CodeInterface") != null)
+					assemblyObj = (CodeInterface)Activator.CreateInstance(t);
+
+			object output = string.Empty;
+
+			try
+			{
+				output = assemblyObj.DoWork(param);
+			}
+			catch(Exception ex)
+			{
+				output = ex.Message;
+			}
+			return new JavaScriptSerializer().Serialize(output);
+		}
+
+		public void storeAssembly(string assemblyName,string serializedString)
+		{
+			byte[] assemblyBinary= new JavaScriptSerializer().Deserialize<byte[]>(serializedString);
+			codeLoader.codeDictionary.writeAssembly(assemblyName, assemblyBinary);
+			codeLoader.saveCodeDictionary();
+			codeLoader.reloadAsseblies();
+		}
 
 		public string preparePayload(Payload payload)
 		{

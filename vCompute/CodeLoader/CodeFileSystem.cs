@@ -18,8 +18,12 @@ namespace CodeLoader
 
 		public int writeAssembly(string assemblyName, byte[] codeBytes)
 		{
-			codeDictionary.Add(assemblyName, codeBytes);
-			return codeBytes.Length;
+			if (!codeDictionary.ContainsKey(assemblyName))
+			{
+				codeDictionary.Add(assemblyName, codeBytes);
+				return codeBytes.Length;
+			}
+			return 0;
 		}
 
 		public byte[] readAssembly(string assemblyName)

@@ -18,15 +18,20 @@ namespace CodeLoader
 		public Loader(string path)
 		{
 			codeFilePath = path;
+			reloadAsseblies();
+		}
+
+		public void reloadAsseblies()
+		{
 			binaryFormatter = new BinaryFormatter();
 			try
 			{
 				fs = new FileStream(codeFilePath, FileMode.OpenOrCreate);
 				codeDictionary = (CodeFileSystem)binaryFormatter.Deserialize(fs);
 				//fs.Dispose();
-				
+
 			}
-			catch(Exception)
+			catch (Exception)
 			{
 				codeDictionary = new CodeFileSystem();
 			}
@@ -36,7 +41,8 @@ namespace CodeLoader
 		{
 			//FileStream fs = new FileStream(codeFilePath, FileMode.Create);
 			binaryFormatter.Serialize(fs, codeDictionary);
-			fs.Dispose();
+
+			//fs.Dispose();
 		}
 	}
 }
