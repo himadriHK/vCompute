@@ -18,10 +18,10 @@ namespace CodeLoader
 		public Loader(string path)
 		{
 			codeFilePath = path;
-			reloadAsseblies();
+			reloadAssemblies();
 		}
 
-		public void reloadAsseblies()
+		public void reloadAssemblies()
 		{
 			binaryFormatter = new BinaryFormatter();
 			try

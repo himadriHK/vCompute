@@ -24,7 +24,7 @@ namespace AdhocTests
 			//loader.saveCodeDictionary();
 			//Console.Read();
 			Server server = new Server(8888);
-			Client client = new Client("localhost", 8888, "himadriHK", "");
+			Client client = new Client("localhost", 8888, "himadriHK", @"C:\Users\Himadri-HK\Documents\client.bin");
 			Console.ReadLine();
 		}
 	}

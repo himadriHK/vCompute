@@ -35,8 +35,8 @@ namespace CommAPI
 			Console.WriteLine("Client Connected");
 			networkDataStream = clientInstance.GetStream();
 			Thread pingThread = new Thread(pingHandler);
-			//Thread dispatcher = new Thread(commandHandler);
-			pingThread.Start();
+				//Thread dispatcher = new Thread(serverMessageHandler);
+				pingThread.Start();
 			//dispatcher.Start();
 			
 			}
@@ -46,13 +46,44 @@ namespace CommAPI
 			}
 		}
 
-		private void commandHandler()
+		private void serverMessageHandler()
 		{
 			Payload payload = commUtil.getPacket(networkDataStream);
 			switch(payload.command)
 			{
+				case CommandType.DOWNLOAD:
+					commUtil.storeAssembly(payload.assemblyName, payload.assemblyBytes);
+				break;
+
+				case CommandType.EXECUTE:
+					executeTask(payload.assemblyName, payload.parameters);
+				break;
+
+				case CommandType.APPEND_ASSEMBLY:
+					commUtil.storeAssembly(payload.assemblyName, payload.assemblyBytes,true);
+				break;
 
 			}
+		}
+
+		public void registerClient(string clientID)
+		{
+
+		}
+
+		public void registerAssembly(string assemblyName)
+		{
+
+		}
+
+		public void uploadAssembly(string assemblyName)
+		{
+
+		}
+
+		private void executeTask(string assemblyName, object parameters)
+		{
+			throw new NotImplementedException();
 		}
 
 		private void pingHandler()

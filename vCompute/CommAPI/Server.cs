@@ -19,7 +19,7 @@ namespace CommAPI
 		public Server(int port)
 		{
 			this.port = port;
-			commUtil = new Common();
+			commUtil = new Common(@"C:\Users\Himadri-HK\Documents\server.bin");
 			listener = new TcpListener(IPAddress.Any, port);
 			listener.Start();
 			Thread acceptConnections = new Thread(processConnections);

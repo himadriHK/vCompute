@@ -9,7 +9,7 @@ using CodeLoader;
 
 namespace CommAPI
 {
-	public enum CommandType { UPLOAD = 101, DOWNLOAD, EXECUTE, DELETE, PING, REGISTER_CLIENT, REGISTER_ASSEMBLY, RESULT, APPEND_ASSEMBLY, STATUS }
+	public enum CommandType { REQUEST = 101, DOWNLOAD, EXECUTE, DELETE, PING, REGISTER_CLIENT, REGISTER_ASSEMBLY, UPLOAD_ASSEMBLY,RESULT, APPEND_ASSEMBLY, STATUS }
 	public class Common
 	{
 		
@@ -44,12 +44,11 @@ namespace CommAPI
 			return new JavaScriptSerializer().Serialize(output);
 		}
 
-		public void storeAssembly(string assemblyName,string serializedString)
+		public void storeAssembly(string assemblyName, byte[] assemblyBinary,bool append=false)
 		{
-			byte[] assemblyBinary= new JavaScriptSerializer().Deserialize<byte[]>(serializedString);
 			codeLoader.codeDictionary.writeAssembly(assemblyName, assemblyBinary);
 			codeLoader.saveCodeDictionary();
-			codeLoader.reloadAsseblies();
+			codeLoader.reloadAssemblies();
 		}
 
 		public string preparePayload(Payload payload)
@@ -95,6 +94,7 @@ namespace CommAPI
 		public string payloadId;
 		public string assemblyName;
 		public byte[] assemblyBytes;
+		public object parameters;
 		public double cpuUsage;
 		public double memUsage;
 		public double responseTime;
