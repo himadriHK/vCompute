@@ -1,8 +1,11 @@
-﻿using CommAPI;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using CommAPI;
 
-
-namespace AdhocTests
+namespace Server
 {
 	class Program
 	{
@@ -23,8 +26,8 @@ namespace AdhocTests
 			//Console.WriteLine(obj.DoWork("Yes"));
 			//loader.saveCodeDictionary();
 			//Console.Read();
-			///Server server = new Server(8888);
-			Client client = new Client("ec2-18-216-239-133.us-east-2.compute.amazonaws.com", 8888, "himadriHK",AppDomain.CurrentDomain.BaseDirectory+ @"client.bin");
+			CommAPI.Server server = new CommAPI.Server(8888);
+			//Client client = new Client("localhost", 8888, "himadriHK", @"C:\Users\Administrator\Documents\client.bin");
 			Console.ReadLine();
 		}
 	}

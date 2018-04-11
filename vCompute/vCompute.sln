@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vComputeClient", "vComputeC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommAPI", "CommAPI\CommAPI.csproj", "{73AB48E0-98BA-4165-B058-8D1BBB096432}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{F4D3929A-3D24-400A-B3D8-4E92F258846E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{73AB48E0-98BA-4165-B058-8D1BBB096432}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73AB48E0-98BA-4165-B058-8D1BBB096432}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73AB48E0-98BA-4165-B058-8D1BBB096432}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4D3929A-3D24-400A-B3D8-4E92F258846E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4D3929A-3D24-400A-B3D8-4E92F258846E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4D3929A-3D24-400A-B3D8-4E92F258846E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4D3929A-3D24-400A-B3D8-4E92F258846E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

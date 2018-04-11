@@ -68,17 +68,28 @@ namespace CommAPI
 
 		public void registerClient(string clientID)
 		{
-
+			Payload tempPayload = new Payload();
+			tempPayload.clientId = clientId;
+			tempPayload.command = CommandType.REGISTER_CLIENT;
+			commUtil.sendPacket(networkDataStream, tempPayload);
 		}
 
 		public void registerAssembly(string assemblyName)
 		{
-
+			Payload tempPayload = new Payload();
+			tempPayload.clientId = clientId;
+			tempPayload.assemblyName = assemblyName;
+			tempPayload.command = CommandType.REGISTER_ASSEMBLY;
+			commUtil.sendPacket(networkDataStream, tempPayload);
 		}
 
 		public void uploadAssembly(string assemblyName)
 		{
-
+			Payload tempPayload = new Payload();
+			tempPayload.clientId = clientId;
+			tempPayload.assemblyName = assemblyName;
+			tempPayload.command = CommandType.UPLOAD_ASSEMBLY;
+			commUtil.sendPacket(networkDataStream, tempPayload);
 		}
 
 		private void executeTask(string assemblyName, object parameters)

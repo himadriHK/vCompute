@@ -19,7 +19,7 @@ namespace CommAPI
 		public Server(int port)
 		{
 			this.port = port;
-			commUtil = new Common(@"C:\Users\Himadri-HK\Documents\server.bin");
+			commUtil = new Common(AppDomain.CurrentDomain.BaseDirectory+@"server.bin");
 			listener = new TcpListener(IPAddress.Any, port);
 			listener.Start();
 			Thread acceptConnections = new Thread(processConnections);
@@ -51,7 +51,7 @@ namespace CommAPI
 				if (networkStream.DataAvailable)
 				{
 					Payload payload = commUtil.getPacket(networkStream);
-					Debug.Print(payload.clientId + " " + payload.command + " " + payload.cpuUsage + " " + payload.memUsage);
+					Console.WriteLine(payload.clientId + " " + payload.command + " " + payload.cpuUsage + " " + payload.memUsage);
 				}
 			}
 		}
