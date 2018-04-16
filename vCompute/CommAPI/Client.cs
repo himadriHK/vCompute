@@ -83,11 +83,12 @@ namespace CommAPI
 			commUtil.sendPacket(networkDataStream, tempPayload);
 		}
 
-		public void uploadAssembly(string assemblyName)
+		public void uploadAssembly(string assemblyName,byte[] assemblyBytes)
 		{
 			Payload tempPayload = new Payload();
 			tempPayload.clientId = clientId;
 			tempPayload.assemblyName = assemblyName;
+			tempPayload.assemblyBytes = assemblyBytes;
 			tempPayload.command = CommandType.UPLOAD_ASSEMBLY;
 			commUtil.sendPacket(networkDataStream, tempPayload);
 		}

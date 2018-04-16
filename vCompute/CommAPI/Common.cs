@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
 using System.Text;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
 using CodeLoader;
@@ -14,6 +14,7 @@ namespace CommAPI
 	{
 		
 		private const int payloadSize = 1024;
+		private const double assemblySize = 5.0;
 		public Loader codeLoader;
 
 		public Common(string codeBinaryFilePath)
@@ -46,7 +47,7 @@ namespace CommAPI
 
 		public void storeAssembly(string assemblyName, byte[] assemblyBinary,bool append=false)
 		{
-			codeLoader.codeDictionary.writeAssembly(assemblyName, assemblyBinary);
+			codeLoader.codeDictionary.writeAssembly(assemblyName, assemblyBinary,3);
 			codeLoader.saveCodeDictionary();
 			codeLoader.reloadAssemblies();
 		}
@@ -63,6 +64,12 @@ namespace CommAPI
 
 		public void sendPacket(NetworkStream stream,Payload payload)
 		{
+			if(payload.assemblyBytes.Length>assemblySize)
+			{
+				byte[][] splittedArray = splitBytes(payload.assemblyBytes);
+				//payload.assemblyBytes
+					//Array.Copy()
+			}
 			string serializedData = preparePayload(payload);
 			byte[] data = Encoding.ASCII.GetBytes(serializedData);
 
@@ -71,7 +78,18 @@ namespace CommAPI
 				stream.Write(data, 0, payloadSize);
 			}
 		}
+		public byte[][] splitBytes(byte[] assemblyBytes)
+		{
+			byte[][] splitBytes = new byte[(int)(Math.Ceiling((assemblyBytes.Length / assemblySize)))][];
 
+			for (double i = 0, j = 0; i < splitBytes.GetLength(0) && j <= assemblyBytes.Length; i++, j += assemblySize)
+			{
+				splitBytes[(int)i] = new byte[Math.Min((int)assemblySize, assemblyBytes.Length - (int)j)];
+				Array.Copy(assemblyBytes, (int)j, splitBytes[(int)i], 0, Math.Min((int)assemblySize, assemblyBytes.Length - (int)j));
+			}
+
+			return splitBytes;
+		}
 		public Payload getPacket(NetworkStream stream)
 		{
 			lock(stream)

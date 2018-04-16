@@ -10,17 +10,29 @@ namespace CodeLoader
 	public class CodeFileSystem
 	{
 		private Dictionary<string, byte[]> codeDictionary;
+		private Dictionary<string, int> codeStoreStatus;
 
 		public CodeFileSystem()
 		{
 			codeDictionary = new Dictionary<string, byte[]>();
+			codeStoreStatus = new Dictionary<string, int>();
 		}
 
-		public int writeAssembly(string assemblyName, byte[] codeBytes)
+		public int writeAssembly(string assemblyName, byte[] codeBytes,int payloadsRemaining)
 		{
 			if (!codeDictionary.ContainsKey(assemblyName))
 			{
 				codeDictionary.Add(assemblyName, codeBytes);
+				codeStoreStatus.Add(assemblyName, payloadsRemaining);
+				return codeBytes.Length;
+			}
+			else if(codeStoreStatus[assemblyName] > 0 && codeStoreStatus[assemblyName]==payloadsRemaining)
+			{
+				byte[] temp=codeDictionary[assemblyName];
+				Array.Resize<byte>(ref temp, codeDictionary[assemblyName].Length + codeBytes.Length);
+				Array.Copy(codeBytes, 0, temp, codeDictionary[assemblyName].Length, codeBytes.Length);
+				codeDictionary[assemblyName] = temp;
+				codeStoreStatus[assemblyName]--;
 				return codeBytes.Length;
 			}
 			return 0;
@@ -28,7 +40,7 @@ namespace CodeLoader
 
 		public byte[] readAssembly(string assemblyName)
 		{
-			if (codeDictionary.ContainsKey(assemblyName))
+			if (codeDictionary.ContainsKey(assemblyName)&& codeStoreStatus.ContainsKey(assemblyName)&& codeStoreStatus[assemblyName]==0)
 				return codeDictionary[assemblyName];
 			else
 				return new byte[] { };

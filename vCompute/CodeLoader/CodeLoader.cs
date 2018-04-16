@@ -29,7 +29,6 @@ namespace CodeLoader
 				fs = new FileStream(codeFilePath, FileMode.OpenOrCreate);
 				codeDictionary = (CodeFileSystem)binaryFormatter.Deserialize(fs);
 				//fs.Dispose();
-
 			}
 			catch (Exception)
 			{
@@ -41,7 +40,6 @@ namespace CodeLoader
 		{
 			//FileStream fs = new FileStream(codeFilePath, FileMode.Create);
 			binaryFormatter.Serialize(fs, codeDictionary);
-
 			//fs.Dispose();
 		}
 	}
