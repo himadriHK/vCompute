@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
 using CodeLoader;
+using System.Security;
+using System.Security.Policy;
 
 namespace CommAPI
 {
@@ -24,8 +26,16 @@ namespace CommAPI
 
 		public string executeAssembly(string assemblyName,object param)
 		{
+			Evidence e = new Evidence();
+			e.AddHostEvidence(new Zone(SecurityZone.Intranet));
+			PermissionSet pset = SecurityManager.GetStandardSandbox(e);
+
+			AppDomainSetup ads = new AppDomainSetup();
+			ads.ApplicationBase = AppDomain.CurrentDomain.BaseDirectory;
+			AppDomain tempDomain = AppDomain.CreateDomain("assemblyName" + new Random().NextDouble().ToString(), e, ads, pset, null);
+
 			byte[] assemblyBinary = codeLoader.codeDictionary.readAssembly(assemblyName);
-			Assembly asm = Assembly.Load(assemblyBinary);
+			Assembly asm = tempDomain.Load(assemblyBinary);
 			CodeInterface assemblyObj = null;
 
 			foreach (Type t in asm.GetTypes())
@@ -45,9 +55,9 @@ namespace CommAPI
 			return new JavaScriptSerializer().Serialize(output);
 		}
 
-		public void storeAssembly(string assemblyName, byte[] assemblyBinary,bool append=false)
+		public void storeAssembly(string assemblyName, byte[] assemblyBinary,bool append=false,int payloadsRemaining=0)
 		{
-			codeLoader.codeDictionary.writeAssembly(assemblyName, assemblyBinary,3);
+			codeLoader.codeDictionary.writeAssembly(assemblyName, assemblyBinary, payloadsRemaining);
 			codeLoader.saveCodeDictionary();
 			codeLoader.reloadAssemblies();
 		}
@@ -110,6 +120,8 @@ namespace CommAPI
 		public string serverId;
 		public string clientId;
 		public string payloadId;
+		public int remainingPayloads;
+		public bool isAppend;
 		public string assemblyName;
 		public byte[] assemblyBytes;
 		public object parameters;

