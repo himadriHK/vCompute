@@ -11,7 +11,7 @@ using System.Security.Policy;
 
 namespace CommAPI
 {
-	public enum CommandType { REQUEST = 101, DOWNLOAD, EXECUTE, DELETE, PING, REGISTER_CLIENT, REGISTER_ASSEMBLY, UPLOAD_ASSEMBLY,RESULT, APPEND_ASSEMBLY, STATUS }
+	public enum CommandType { REQUEST = 101,APPEND_REQUEST, DOWNLOAD, EXECUTE, DELETE, PING, REGISTER_CLIENT, REGISTER_ASSEMBLY, UPLOAD_ASSEMBLY,RESULT, APPEND_ASSEMBLY,APPEND_RESULT, STATUS }
 	public class Common
 	{
 		
@@ -74,12 +74,6 @@ namespace CommAPI
 
 		public void sendPacket(NetworkStream stream,Payload payload)
 		{
-			if(payload.assemblyBytes.Length>assemblySize)
-			{
-				byte[][] splittedArray = splitBytes(payload.assemblyBytes);
-				//payload.assemblyBytes
-					//Array.Copy()
-			}
 			string serializedData = preparePayload(payload);
 			byte[] data = Encoding.ASCII.GetBytes(serializedData);
 
@@ -88,6 +82,7 @@ namespace CommAPI
 				stream.Write(data, 0, payloadSize);
 			}
 		}
+
 		public byte[][] splitBytes(byte[] assemblyBytes)
 		{
 			byte[][] splitBytes = new byte[(int)(Math.Ceiling((assemblyBytes.Length / assemblySize)))][];
@@ -100,6 +95,31 @@ namespace CommAPI
 
 			return splitBytes;
 		}
+
+		public string[] splitSerializedData(string data)
+		{
+			string[] splitData= new string[(int)(Math.Ceiling((data.Length / assemblySize)))];
+			char[] tempData = data.ToCharArray();
+
+			for (double i = 0, j = 0; i < splitData.Length && j <= tempData.Length; i++, j += assemblySize)
+			{
+				char[] tempCharData= new char[Math.Min((int)assemblySize, data.Length - (int)j)];
+				Array.Copy(tempData, (int)j, tempCharData, 0, Math.Min((int)assemblySize, tempData.Length - (int)j));
+				splitData[(int)i] = new string(tempCharData);
+			}
+			return splitData;
+		}
+
+		public object blockUntilResult(int runId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void addToTaskList(int runId)
+		{
+			throw new NotImplementedException();
+		}
+
 		public Payload getPacket(NetworkStream stream)
 		{
 			lock(stream)
@@ -121,10 +141,11 @@ namespace CommAPI
 		public string clientId;
 		public string payloadId;
 		public int remainingPayloads;
+		public int runId;
 		public bool isAppend;
 		public string assemblyName;
 		public byte[] assemblyBytes;
-		public object parameters;
+		public string jsonParameters;
 		public double cpuUsage;
 		public double memUsage;
 		public double responseTime;

@@ -10,6 +10,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace CommAPI
 {
@@ -21,6 +22,7 @@ namespace CommAPI
 		private TcpClient clientInstance;
 		private NetworkStream networkDataStream;
 		private Common commUtil;
+		private int runID;
 
 		public Client(string host,int port,string clientKey,string swapFilePath)
 		{
@@ -29,6 +31,7 @@ namespace CommAPI
 			clientId = clientKey;
 			clientInstance = new TcpClient();
 			commUtil = new Common(swapFilePath);
+			runID = 1;
 			try
 			{
 			clientInstance.Connect(hostAddress, port);
@@ -59,10 +62,56 @@ namespace CommAPI
 				break;
 
 				case CommandType.EXECUTE:
-					executeTask(payload.assemblyName, payload.parameters);
+					executeTask(payload.assemblyName, payload.jsonParameters);
 				break;
 
+				case CommandType.RESULT:
+				case CommandType.APPEND_RESULT:
+					storeResult(payload.assemblyName, payload.runId, payload.jsonOutput,payload.isAppend, payload.remainingPayloads);
+				break;
 			}
+		}
+
+		private void storeResult(string assemblyName, int runId, string jsonOutput, bool isAppend, int remainingPayloads)
+		{
+			throw new NotImplementedException();
+		}
+
+		public object requestTask(string assemblyName,object param)
+		{
+			string[] serializedParams = commUtil.splitSerializedData(new JavaScriptSerializer().Serialize(param));
+			int runId= getNewRunID();
+
+			Payload taskPayload = new Payload();
+			taskPayload.command = CommandType.REQUEST;
+			taskPayload.clientId = clientId;
+			taskPayload.assemblyName = assemblyName;
+			taskPayload.clientTime = DateTime.Now;
+			taskPayload.jsonParameters = serializedParams[0];
+			taskPayload.runId = getNewRunID();
+
+			commUtil.sendPacket(networkDataStream, taskPayload);
+			
+			for(int i=1;i<serializedParams.Length;i++)
+			{
+				Payload taskExtraPayload = new Payload();
+				taskExtraPayload.command = CommandType.APPEND_REQUEST;
+				taskExtraPayload.clientId = clientId;
+				taskExtraPayload.assemblyName = assemblyName;
+				taskExtraPayload.clientTime = DateTime.Now;
+				taskExtraPayload.jsonParameters = serializedParams[i];
+				taskExtraPayload.runId = runId;
+				commUtil.sendPacket(networkDataStream, taskExtraPayload);
+			}
+
+			commUtil.addToTaskList(runId);
+
+			return commUtil.blockUntilResult(runId);
+		}
+
+		private int getNewRunID()
+		{
+			return runID++;
 		}
 
 		public void registerClient(string clientID)
