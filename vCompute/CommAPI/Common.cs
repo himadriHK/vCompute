@@ -8,20 +8,29 @@ using System.Reflection;
 using CodeLoader;
 using System.Security;
 using System.Security.Policy;
+using System.Diagnostics;
 
 namespace CommAPI
 {
-	public enum CommandType { REQUEST = 101,APPEND_REQUEST, DOWNLOAD, EXECUTE, DELETE, PING, REGISTER_CLIENT, REGISTER_ASSEMBLY, UPLOAD_ASSEMBLY,RESULT, APPEND_ASSEMBLY,APPEND_RESULT, STATUS }
+	public enum CommandType { REQUEST = 101,APPEND_REQUEST, DOWNLOAD, EXECUTE,EXECUTE_APPEND, DELETE, PING, REGISTER_CLIENT, REGISTER_ASSEMBLY, UPLOAD_ASSEMBLY,RESULT, APPEND_ASSEMBLY,APPEND_RESULT, STATUS }
 	public class Common
 	{
 		
 		private const int payloadSize = 1024;
-		private const double assemblySize = 5.0;
+		private const double assemblySize = 1000.0;
+		private Dictionary<int, Payload> TaskList;
 		public Loader codeLoader;
+		private int timeOut=30;
 
 		public Common(string codeBinaryFilePath)
 		{
 			codeLoader = new Loader(codeBinaryFilePath);
+			TaskList = new Dictionary<int, Payload>();
+		}
+
+		public string executeAssembly(string assemblyName, string param)
+		{
+			return executeAssembly(assemblyName, new JavaScriptSerializer().Deserialize<object>(param));
 		}
 
 		public string executeAssembly(string assemblyName,object param)
@@ -112,12 +121,53 @@ namespace CommAPI
 
 		public object blockUntilResult(int runId)
 		{
-			throw new NotImplementedException();
+			Payload resultPayload = TaskList[runId];
+			Stopwatch timer = new Stopwatch();
+			timer.Start();
+			while(true)
+			{
+				if (resultPayload == null || resultPayload.isAppend == true)
+					continue;
+
+				if (resultPayload.isAppend == false && resultPayload.remainingPayloads == 0 && timer.Elapsed==new TimeSpan(0,0,timeOut))
+					break;
+			}
+			timer.Stop();
+			if (resultPayload != null && resultPayload.isAppend == false && resultPayload.remainingPayloads == 0)
+				return new JavaScriptSerializer().Deserialize<object>(resultPayload.jsonOutput);
+			else
+				return null;
+		}
+
+		public void storeResult(string assemblyName, int runId, string jsonOutput, bool isAppend, int remainingPayloads)
+		{
+			lock (TaskList)
+			{
+				Payload partialResult = TaskList[runId];
+				if (partialResult == null)
+				{
+					partialResult = new Payload();
+					partialResult.assemblyName = assemblyName;
+					partialResult.runId = runId;
+					partialResult.jsonOutput = jsonOutput;
+					partialResult.isAppend = isAppend;
+					partialResult.remainingPayloads = remainingPayloads;
+				}
+				else
+				{
+					partialResult.jsonOutput += jsonOutput;
+					partialResult.isAppend = isAppend;
+					partialResult.remainingPayloads = remainingPayloads;
+				}
+
+				TaskList[runId] = partialResult;
+			}
 		}
 
 		public void addToTaskList(int runId)
 		{
-			throw new NotImplementedException();
+			lock(TaskList)
+			TaskList.Add(runId, null);
 		}
 
 		public Payload getPacket(NetworkStream stream)

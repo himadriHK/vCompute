@@ -23,6 +23,7 @@ namespace CommAPI
 		private NetworkStream networkDataStream;
 		private Common commUtil;
 		private int runID;
+		private Dictionary<int, Payload> execData;
 
 		public Client(string host,int port,string clientKey,string swapFilePath)
 		{
@@ -32,6 +33,7 @@ namespace CommAPI
 			clientInstance = new TcpClient();
 			commUtil = new Common(swapFilePath);
 			runID = 1;
+			execData = new Dictionary<int, Payload>();
 			try
 			{
 			clientInstance.Connect(hostAddress, port);
@@ -62,19 +64,15 @@ namespace CommAPI
 				break;
 
 				case CommandType.EXECUTE:
-					executeTask(payload.assemblyName, payload.jsonParameters);
+				case CommandType.EXECUTE_APPEND:
+					executeTask(payload);
 				break;
 
 				case CommandType.RESULT:
 				case CommandType.APPEND_RESULT:
-					storeResult(payload.assemblyName, payload.runId, payload.jsonOutput,payload.isAppend, payload.remainingPayloads);
+					commUtil.storeResult(payload.assemblyName, payload.runId, payload.jsonOutput,payload.isAppend, payload.remainingPayloads);
 				break;
 			}
-		}
-
-		private void storeResult(string assemblyName, int runId, string jsonOutput, bool isAppend, int remainingPayloads)
-		{
-			throw new NotImplementedException();
 		}
 
 		public object requestTask(string assemblyName,object param)
@@ -88,8 +86,9 @@ namespace CommAPI
 			taskPayload.assemblyName = assemblyName;
 			taskPayload.clientTime = DateTime.Now;
 			taskPayload.jsonParameters = serializedParams[0];
-			taskPayload.runId = getNewRunID();
-
+			taskPayload.runId = runId;
+			taskPayload.isAppend = serializedParams.Length > 1;
+			taskPayload.remainingPayloads = serializedParams.Length - 1;
 			commUtil.sendPacket(networkDataStream, taskPayload);
 			
 			for(int i=1;i<serializedParams.Length;i++)
@@ -100,6 +99,8 @@ namespace CommAPI
 				taskExtraPayload.assemblyName = assemblyName;
 				taskExtraPayload.clientTime = DateTime.Now;
 				taskExtraPayload.jsonParameters = serializedParams[i];
+				taskExtraPayload.isAppend = (i != (serializedParams.Length - 1));
+				taskExtraPayload.remainingPayloads = serializedParams.Length - 2;
 				taskExtraPayload.runId = runId;
 				commUtil.sendPacket(networkDataStream, taskExtraPayload);
 			}
@@ -139,11 +140,91 @@ namespace CommAPI
 			tempPayload.assemblyBytes = assemblyBytes;
 			tempPayload.command = CommandType.UPLOAD_ASSEMBLY;
 			commUtil.sendPacket(networkDataStream, tempPayload);
+
+			byte[][] serializedBytes = commUtil.splitBytes(assemblyBytes);
+
+			Payload assemblyPayload = new Payload();
+			assemblyPayload.command = CommandType.UPLOAD_ASSEMBLY;
+			assemblyPayload.clientId = clientId;
+			assemblyPayload.assemblyName = assemblyName;
+			assemblyPayload.clientTime = DateTime.Now;
+			assemblyPayload.assemblyBytes = serializedBytes[0];
+			assemblyPayload.isAppend = serializedBytes.GetLength(0) > 1;
+			assemblyPayload.remainingPayloads = serializedBytes.GetLength(0) - 1;
+			commUtil.sendPacket(networkDataStream, assemblyPayload);
+
+			for (int i = 1; i < assemblyBytes.GetLength(0); i++)
+			{
+				Payload assemblyExtraPayload = new Payload();
+				assemblyExtraPayload.command = CommandType.APPEND_ASSEMBLY;
+				assemblyExtraPayload.clientId = clientId;
+				assemblyExtraPayload.assemblyName = assemblyName;
+				assemblyExtraPayload.clientTime = DateTime.Now;
+				assemblyExtraPayload.assemblyBytes = serializedBytes[i];
+				assemblyExtraPayload.isAppend = (i != (serializedBytes.GetLength(0) - 1));
+				assemblyExtraPayload.remainingPayloads = serializedBytes.GetLength(0) - 2;
+				commUtil.sendPacket(networkDataStream, assemblyExtraPayload);
+			}
 		}
 
-		private void executeTask(string assemblyName, object parameters)
+		private void executeTask(Payload incoming)
 		{
-			string result=commUtil.executeAssembly(assemblyName, parameters);
+			if(execData.ContainsKey(incoming.runId))
+			{
+				lock (execData)
+				{
+					Payload prevData = execData[incoming.runId];
+					prevData.remainingPayloads = incoming.remainingPayloads;
+					prevData.jsonParameters += incoming.jsonParameters;
+					prevData.isAppend = incoming.isAppend;
+					execData[incoming.runId] = prevData;
+				}
+
+				if(incoming.isAppend==false && incoming.remainingPayloads==0)
+				{
+					string result = commUtil.executeAssembly(execData[incoming.runId].assemblyName, execData[incoming.runId].jsonParameters);
+					string[] serializedResult = commUtil.splitSerializedData(result);
+
+					Payload resultPayload = new Payload();
+					resultPayload.command = CommandType.RESULT;
+					resultPayload.clientId = clientId;
+					resultPayload.assemblyName = incoming.assemblyName;
+					resultPayload.clientTime = DateTime.Now;
+					resultPayload.jsonOutput = serializedResult[0];
+					resultPayload.runId = incoming.runId;
+					resultPayload.isAppend = serializedResult.Length > 1;
+					resultPayload.remainingPayloads = serializedResult.Length - 1;
+					commUtil.sendPacket(networkDataStream, resultPayload);
+
+					for (int i = 1; i < serializedResult.Length; i++)
+					{
+						Payload resultExtraPayload = new Payload();
+						resultExtraPayload.command = CommandType.APPEND_RESULT;
+						resultExtraPayload.clientId = clientId;
+						resultExtraPayload.assemblyName = incoming.assemblyName;
+						resultExtraPayload.clientTime = DateTime.Now;
+						resultExtraPayload.jsonOutput = serializedResult[i];
+						resultExtraPayload.isAppend = (i != (serializedResult.Length - 1));
+						resultExtraPayload.remainingPayloads = serializedResult.Length - 2;
+						resultExtraPayload.runId = incoming.runId;
+						commUtil.sendPacket(networkDataStream, resultExtraPayload);
+					}
+					execData.Remove(incoming.runId);
+				}
+			}
+
+			else
+			{
+				Payload resultParams = new Payload();
+				resultParams.runId = incoming.runId;
+				resultParams.assemblyName = incoming.assemblyName;
+				resultParams.command = incoming.command;
+				resultParams.isAppend = incoming.isAppend;
+				resultParams.jsonOutput = incoming.jsonOutput;
+				resultParams.remainingPayloads = incoming.remainingPayloads;
+				execData.Add(incoming.runId, resultParams);
+			}
+			
 		}
 
 		private void pingHandler()
