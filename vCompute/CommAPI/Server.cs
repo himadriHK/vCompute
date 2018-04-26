@@ -51,9 +51,74 @@ namespace CommAPI
 				if (networkStream.DataAvailable)
 				{
 					Payload payload = commUtil.getPacket(networkStream);
+					switch (payload.command)
+					{
+						case CommandType.REQUEST:
+						case CommandType.APPEND_REQUEST:
+							sendToExecuteQueue(payload);
+						break;
+
+						case CommandType.RESULT:
+						case CommandType.APPEND_RESULT:
+							sendToResultQueue(payload);
+						break;
+
+						case CommandType.REGISTER_CLIENT:
+							doRegisterClient(payload);
+						break;
+
+						case CommandType.REGISTER_ASSEMBLY:
+							doRegisterAssembly(payload);
+						break;
+
+						case CommandType.UPLOAD_ASSEMBLY:
+						case CommandType.APPEND_ASSEMBLY:
+							doSaveAssembly(payload);
+						break;
+
+						case CommandType.DOWNLOAD:
+							doSendAssembly(payload);
+						break;
+
+					}
 					Console.WriteLine(payload.clientId + " " + payload.command + " " + payload.cpuUsage + " " + payload.memUsage);
 				}
 			}
 		}
+
+		private void doSendAssembly(Payload payload)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void doSaveAssembly(Payload payload)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void doRegisterAssembly(Payload payload)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void doRegisterClient(Payload payload)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void sendToResultQueue(Payload payload)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void sendToExecuteQueue(Payload payload)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public class payloadDispatch
+	{
+
 	}
 }

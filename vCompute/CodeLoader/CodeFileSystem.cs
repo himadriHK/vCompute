@@ -45,5 +45,10 @@ namespace CodeLoader
 			else
 				return new byte[] { };
 		}
+		
+		public string[] getAssemblyList()
+		{
+			return codeDictionary.Keys.ToArray<string>();
+		}
 	}
 }

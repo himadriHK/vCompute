@@ -72,6 +72,7 @@ namespace CommAPI
 				case CommandType.APPEND_RESULT:
 					commUtil.storeResult(payload.assemblyName, payload.runId, payload.jsonOutput,payload.isAppend, payload.remainingPayloads);
 				break;
+
 			}
 		}
 
