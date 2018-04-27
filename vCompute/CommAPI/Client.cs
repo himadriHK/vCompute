@@ -25,6 +25,7 @@ namespace CommAPI
 		private int runID;
 		private Dictionary<int, Payload> execData;
 
+		//client constructor
 		public Client(string host,int port,string clientKey,string swapFilePath)
 		{
 			hostAddress = host;
