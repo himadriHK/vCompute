@@ -115,7 +115,7 @@ namespace CommAPI
 			return runID++;
 		}
 
-		public void registerClient(string clientID)
+		public void registerClient(string clientid)
 		{
 			Payload tempPayload = new Payload();
 			tempPayload.clientId = clientId;
