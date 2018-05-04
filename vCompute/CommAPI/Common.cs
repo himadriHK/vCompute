@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace CommAPI
 {
-	public enum CommandType { REQUEST = 101,APPEND_REQUEST, DOWNLOAD, EXECUTE,EXECUTE_APPEND, DELETE, PING, REGISTER_CLIENT, REGISTER_ASSEMBLY, UPLOAD_ASSEMBLY,RESULT, APPEND_ASSEMBLY,APPEND_RESULT, STATUS }
+	public enum CommandType { REQUEST = 101,APPEND_REQUEST, DOWNLOAD, EXECUTE,EXECUTE_APPEND, DELETE, PING, REGISTER_CLIENT, REGISTER_ASSEMBLY, UPLOAD_ASSEMBLY,RESULT, APPEND_ASSEMBLY,APPEND_RESULT, STATUS, DISCOVERY }
 	public class Common
 	{
 		
@@ -42,6 +42,9 @@ namespace CommAPI
 			AppDomainSetup ads = new AppDomainSetup();
 			ads.ApplicationBase = AppDomain.CurrentDomain.BaseDirectory;
 			AppDomain tempDomain = AppDomain.CreateDomain("assemblyName" + new Random().NextDouble().ToString(), e, ads, pset, null);
+
+			if (assemblyName.ToLower() == "discovery")
+				return string.Join(",", codeLoader.codeDictionary.getAssemblyList());
 
 			byte[] assemblyBinary = codeLoader.codeDictionary.readAssembly(assemblyName);
 			Assembly asm = tempDomain.Load(assemblyBinary);
@@ -202,5 +205,13 @@ namespace CommAPI
 		public string jsonOutput;
 		public DateTime? serverTime;
 		public DateTime? clientTime;
+	}
+
+	public class sortPayload:IComparer<Payload>
+	{
+		public int Compare(Payload x, Payload y)
+		{
+			return x.remainingPayloads.CompareTo(y.remainingPayloads);
+		}
 	}
 }
