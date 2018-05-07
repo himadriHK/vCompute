@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +12,6 @@ namespace CodeLoader
 	public class Loader
 	{
 		public CodeFileSystem codeDictionary { get; set; }
-		IFormatter binaryFormatter;
 		string codeFilePath;
 		FileStream fs;
 		public Loader(string path)
@@ -23,24 +22,26 @@ namespace CodeLoader
 
 		public void reloadAssemblies()
 		{
-			binaryFormatter = new BinaryFormatter();
-			try
-			{
-				fs = new FileStream(codeFilePath, FileMode.OpenOrCreate);
-				codeDictionary = (CodeFileSystem)binaryFormatter.Deserialize(fs);
-				//fs.Dispose();
-			}
-			catch (Exception)
-			{
+			IFormatter binaryFormatter = new BinaryFormatter();
+			if(File.Exists(codeFilePath))
+				fs = new FileStream(codeFilePath, FileMode.Open,FileAccess.Read);
+			else
+				fs = new FileStream(codeFilePath, FileMode.Create, FileAccess.Write);
+
+			if (fs.Length == 0)
 				codeDictionary = new CodeFileSystem();
-			}
+			else
+				codeDictionary = (CodeFileSystem)binaryFormatter.Deserialize(fs);
+			fs.Close();
 		}
 
 		public void saveCodeDictionary()
 		{
-			//FileStream fs = new FileStream(codeFilePath, FileMode.Create);
+			IFormatter binaryFormatter = new BinaryFormatter();
+			if (File.Exists(codeFilePath))
+				fs = new FileStream(codeFilePath, FileMode.Create, FileAccess.Write);
 			binaryFormatter.Serialize(fs, codeDictionary);
-			//fs.Dispose();
+			fs.Close();
 		}
 	}
 }
