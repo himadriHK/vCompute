@@ -23,10 +23,10 @@ namespace CodeLoader
 			if (!codeDictionary.ContainsKey(assemblyName))
 			{
 				codeDictionary.Add(assemblyName, codeBytes);
-				codeStoreStatus.Add(assemblyName, payloadsRemaining);
+				codeStoreStatus.Add(assemblyName, payloadsRemaining-1);
 				return codeBytes.Length;
 			}
-			else if(codeStoreStatus[assemblyName] > 0 && codeStoreStatus[assemblyName]==payloadsRemaining)
+			else if(codeStoreStatus[assemblyName] >= 0 && codeStoreStatus[assemblyName]==payloadsRemaining)
 			{
 				byte[] temp=codeDictionary[assemblyName];
 				Array.Resize<byte>(ref temp, codeDictionary[assemblyName].Length + codeBytes.Length);
@@ -40,7 +40,7 @@ namespace CodeLoader
 
 		public byte[] readAssembly(string assemblyName)
 		{
-			if (codeDictionary.ContainsKey(assemblyName)&& codeStoreStatus.ContainsKey(assemblyName)&& codeStoreStatus[assemblyName]==0)
+			if (codeDictionary.ContainsKey(assemblyName)&& codeStoreStatus.ContainsKey(assemblyName)&& codeStoreStatus[assemblyName]==-1)
 				return codeDictionary[assemblyName];
 			else
 				return new byte[] { };
