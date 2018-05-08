@@ -1,4 +1,4 @@
-using CodeLoader;
+﻿using CodeLoader;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -108,7 +108,7 @@ namespace CommAPI
 				taskExtraPayload.clientTime = DateTime.Now;
 				taskExtraPayload.jsonParameters = serializedParams[i];
 				taskExtraPayload.isAppend = (i != (serializedParams.Length - 1));
-				taskExtraPayload.remainingPayloads = serializedParams.Length - 2;
+				taskExtraPayload.remainingPayloads = (serializedParams.Length - 1)-i;
 				taskExtraPayload.runId = runId.ToString();
 				commUtil.sendPacket(networkDataStream, taskExtraPayload);
 			}
