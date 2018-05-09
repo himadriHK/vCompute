@@ -19,6 +19,7 @@ namespace CommAPI
 		public  Dictionary<string, Queue<Payload>> taskPayLoad = new Dictionary<string, Queue<Payload>>();
 		public Dictionary<string, payloadDispatch> taskPayloadDispatch = new Dictionary<string, payloadDispatch>();
 		private List<clientStatistics> clientList;
+		public static int ClientNo = 1;
 		 public Server(int port)
 		{
 			this.port = port;
@@ -132,16 +133,31 @@ namespace CommAPI
 
         private void doRegisterClient(Payload payload, NetworkStream networkStream)
         {
-            const string selections = "0123456789";
-            Random random = new Random();
+            string ClientId = "Client" + ClientNo;
             Payload outputClientIdPayLoad = new Payload();
-            outputClientIdPayLoad.command = CommandType.CLIENT_REGISTRTION;
-            outputClientIdPayLoad.clientId = new string(Enumerable.Repeat(selections, 2).Select(s => s[random.Next(s.Length)]).ToArray());
-
-            commUtil.sendPacket(networkStream, outputClientIdPayLoad);
+            outputClientIdPayLoad.clientId = ClientId;
+	        if (!taskPayLoad.ContainsKey(outputClientIdPayLoad.clientId))
+	        {
+				taskPayLoad.Add(outputClientIdPayLoad.clientId, new Queue<Payload>());
+				Thread newClientThreadStart = new Thread(()=>sendPacketsToClient(ClientId,networkStream));
+				newClientThreadStart.Start();
+				ClientNo++;
+			}
+			commUtil.sendPacket(networkStream, outputClientIdPayLoad);
         }
 
-        private void sendToResultQueue(Payload payload)
+		private void sendPacketsToClient(string clientId, NetworkStream networkStream)
+		{
+			var Q = taskPayLoad[clientId];
+			while(true)
+			lock (Q)
+			{
+				foreach(Payload p in Q)
+					commUtil.sendPacket(networkStream,p);
+			}
+		}
+
+		private void sendToResultQueue(Payload payload)
 		{
 			string toId = null;
 			string fromId = null;

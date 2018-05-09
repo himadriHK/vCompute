@@ -69,7 +69,7 @@ namespace CommAPI
 							break;
 
 						case CommandType.EXECUTE:
-						case CommandType.EXECUTE_APPEND:
+						case CommandType.APPEND_EXECUTE:
 							executeTask(payload);
 							break;
 
