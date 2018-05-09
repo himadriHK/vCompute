@@ -131,6 +131,7 @@ namespace CommAPI
             const string selections = "0123456789";
             Random random = new Random();
             Payload outputClientIdPayLoad = new Payload();
+            outputClientIdPayLoad.command = CommandType.CLIENT_REGISTRTION;
             outputClientIdPayLoad.clientId = new string(Enumerable.Repeat(selections, 2).Select(s => s[random.Next(s.Length)]).ToArray());
 
             commUtil.sendPacket(networkStream, outputClientIdPayLoad);
