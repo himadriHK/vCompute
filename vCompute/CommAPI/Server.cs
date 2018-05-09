@@ -87,6 +87,7 @@ namespace CommAPI
 
 					}
 					Console.WriteLine(payload.clientId + " " + payload.command + " " + payload.cpuUsage + " " + payload.memUsage);
+                    Thread.Sleep(10000);
 				}
 			}
 		}
@@ -135,15 +136,17 @@ namespace CommAPI
         {
             string ClientId = "Client" + ClientNo;
             Payload outputClientIdPayLoad = new Payload();
+            outputClientIdPayLoad.command = CommandType.CLIENT_REGISTRTION;
             outputClientIdPayLoad.clientId = ClientId;
-	        if (!taskPayLoad.ContainsKey(outputClientIdPayLoad.clientId))
+            commUtil.sendPacket(networkStream, outputClientIdPayLoad);
+            if (!taskPayLoad.ContainsKey(outputClientIdPayLoad.clientId))
 	        {
 				taskPayLoad.Add(outputClientIdPayLoad.clientId, new Queue<Payload>());
 				Thread newClientThreadStart = new Thread(()=>sendPacketsToClient(ClientId,networkStream));
 				newClientThreadStart.Start();
 				ClientNo++;
 			}
-			commUtil.sendPacket(networkStream, outputClientIdPayLoad);
+			
         }
 
 		private void sendPacketsToClient(string clientId, NetworkStream networkStream)
