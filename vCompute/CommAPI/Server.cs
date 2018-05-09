@@ -77,7 +77,7 @@ namespace CommAPI
 						break;
 
 						case CommandType.DOWNLOAD:
-							doSendAssembly(payload);
+							doSendAssembly(payload, networkStream);
 						break;
 
 					}
@@ -86,15 +86,40 @@ namespace CommAPI
 			}
 		}
 
-		private void doSendAssembly(Payload payload)
+		private void doSendAssembly(Payload payload, NetworkStream networkDataStream)
 		{
-			throw new NotImplementedException();
-		}
+            byte[] outputAssembly = commUtil.readAssembly(payload.assemblyName);
+
+            byte[][] serializedBytes = commUtil.splitBytes(outputAssembly);
+
+            Payload assemblyPayload = new Payload();
+            assemblyPayload.command = CommandType.DOWNLOAD;
+            assemblyPayload.clientId = payload.clientId;
+            assemblyPayload.assemblyName = payload.assemblyName;
+            assemblyPayload.clientTime = DateTime.Now;
+            assemblyPayload.assemblyBytes = serializedBytes[0];
+            assemblyPayload.isAppend = serializedBytes.GetLength(0) > 1;
+            assemblyPayload.remainingPayloads = serializedBytes.GetLength(0) - 1;
+            commUtil.sendPacket(networkDataStream, assemblyPayload);
+
+            for (int i = 1; i < serializedBytes.GetLength(0); i++)
+            {
+                Payload assemblyExtraPayload = new Payload();
+                assemblyExtraPayload.command = CommandType.APPEND_ASSEMBLY;
+                assemblyExtraPayload.clientId = payload.clientId;
+                assemblyExtraPayload.assemblyName = payload.assemblyName;
+                assemblyExtraPayload.clientTime = DateTime.Now;
+                assemblyExtraPayload.assemblyBytes = serializedBytes[i];
+                assemblyExtraPayload.isAppend = (i != (serializedBytes.GetLength(0) - 1));
+                assemblyExtraPayload.remainingPayloads = (serializedBytes.GetLength(0) - 1) - i;
+                commUtil.sendPacket(networkDataStream, assemblyExtraPayload);
+            }
+        }
 
 		private void doSaveAssembly(Payload payload)
 		{
-			throw new NotImplementedException();
-		}
+            commUtil.storeAssembly(payload.assemblyName, payload.assemblyBytes, payload.isAppend, payload.remainingPayloads);
+        }
 
 		private void doRegisterAssembly(Payload payload, NetworkStream networkstream)
 		{
