@@ -16,12 +16,16 @@ namespace CommAPI
 		int port;
 		TcpClient client;
 		Common commUtil;
-		public Server(int port)
+		public  Dictionary<string, Queue<Payload>> taskPayLoad = new Dictionary<string, Queue<Payload>>();
+		public Dictionary<string, payloadDispatch> taskPayloadDispatch = new Dictionary<string, payloadDispatch>();
+		private List<clientStatistics> clientList;
+		 public Server(int port)
 		{
 			this.port = port;
 			commUtil = new Common(AppDomain.CurrentDomain.BaseDirectory+@"server.bin");
 			listener = new TcpListener(IPAddress.Any, port);
 			listener.Start();
+			clientList=new List<clientStatistics>();
 			Thread acceptConnections = new Thread(processConnections);
 			acceptConnections.Start();
 		}
@@ -108,17 +112,91 @@ namespace CommAPI
 
 		private void sendToResultQueue(Payload payload)
 		{
-			throw new NotImplementedException();
+			string toId = null;
+			string fromId = null;
+			string runId;
+			payloadDispatch dispatch = null;
+			if (taskPayloadDispatch.ContainsKey(payload.runId))
+			{
+				dispatch = taskPayloadDispatch[payload.runId];
+				toId = dispatch.fromClient;
+				fromId = dispatch.toClient;
+				payload.runId = payload.runId.Replace(dispatch.toClient,"");
+			}
+
+			if (toId != null)
+			{
+				var requestQueue = taskPayLoad[toId];
+				requestQueue.Enqueue(payload);
+			}
 		}
 
 		private void sendToExecuteQueue(Payload payload)
 		{
-			throw new NotImplementedException();
+			string runId = payload.clientId + payload.runId;
+			payloadDispatch dispatch = null;
+			if (taskPayLoad.ContainsKey(runId))
+			{
+				dispatch = taskPayloadDispatch[runId];
+			}
+			else
+			{
+				dispatch.fromClient = payload.clientId;
+				dispatch.runId = payload.clientId + payload.runId;
+				dispatch.toClient = clientList.First().Name;
+				taskPayloadDispatch.Add(runId, dispatch);
+			}
+
+			var toId = dispatch.toClient;
+			
+			payload.runId = dispatch.runId;
+			if (payload.command == CommandType.REQUEST)
+				payload.command = CommandType.EXECUTE;
+			else if(payload.command == CommandType.APPEND_REQUEST)
+				payload.command = CommandType.APPEND_EXECUTE;
+
+			var Q = taskPayLoad[toId];
+			Q.Enqueue(payload);
 		}
 	}
 
 	public class payloadDispatch
 	{
+		public string fromClient;
+		public string toClient;
+		public string runId;
+	}
 
+	public class clientStatistics : IComparable<clientStatistics>
+	{
+		List<clientStatistics> containerList;
+		double load;
+		public clientStatistics(List<clientStatistics> list)
+		{
+			containerList = list;
+		}
+		public string Name { get; set; }
+		public double Load
+		{
+			get
+			{
+				return load;
+			}
+
+			set
+			{
+				load = value;
+				lock (containerList)
+				{
+					containerList.Sort();
+				}
+			}
+		}
+
+
+		public int CompareTo(clientStatistics other)
+		{
+			return Load.CompareTo(other.Load);
+		}
 	}
 }
