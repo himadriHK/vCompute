@@ -16,7 +16,7 @@ namespace CommAPI
 {
     public class Client
     {
-		private string clientId;
+		public string clientId;
 		private string hostAddress;
 		private int port;
 		private TcpClient clientInstance;
@@ -26,11 +26,10 @@ namespace CommAPI
 		private Dictionary<string, Payload> execData;
 
 		//client constructor
-		public Client(string host,int port,string clientKey)
+		public Client(string host,int port)
 		{
 			hostAddress = host;
 			this.port = port;
-			clientId = clientKey;
 			clientInstance = new TcpClient();
 			commUtil = new Common(AppDomain.CurrentDomain.BaseDirectory + @"client.bin");
 			runID = 1;
@@ -78,10 +77,20 @@ namespace CommAPI
 						case CommandType.APPEND_RESULT:
 							commUtil.storeResult(payload.assemblyName, payload.runId, payload.jsonOutput, payload.isAppend, payload.remainingPayloads);
 							break;
+
+                        case CommandType.CLIENT_REGISTRTION:
+                            setClientID(payload);
+                            break;
 					}
 				}
 			}
 		}
+
+        private void setClientID(Payload payload)
+        {
+            clientId = payload.clientId;
+
+        }
 
 		public object requestTask(string assemblyName,object param)
 		{
@@ -123,7 +132,7 @@ namespace CommAPI
 			return runID++;
 		}
 
-		public void registerClient(string clientID)
+		public void registerClient()
 		{
 			Payload tempPayload = new Payload();
 			tempPayload.clientId = clientId;
