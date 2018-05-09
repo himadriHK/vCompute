@@ -64,11 +64,11 @@ namespace CommAPI
 						break;
 
 						case CommandType.REGISTER_CLIENT:
-							doRegisterClient(payload);
+							doRegisterClient(payload,networkStream);
 						break;
 
 						case CommandType.REGISTER_ASSEMBLY:
-							doRegisterAssembly(payload);
+							doRegisterAssembly(payload, networkStream);
 						break;
 
 						case CommandType.UPLOAD_ASSEMBLY:
@@ -96,17 +96,22 @@ namespace CommAPI
 			throw new NotImplementedException();
 		}
 
-		private void doRegisterAssembly(Payload payload)
+		private void doRegisterAssembly(Payload payload, NetworkStream networkstream)
 		{
-			throw new NotImplementedException();
-		}
+            commUtil.storeAssembly(payload.assemblyName, new byte[0], false,0);
+        }
 
-		private void doRegisterClient(Payload payload)
-		{
-			throw new NotImplementedException();
-		}
+        private void doRegisterClient(Payload payload, NetworkStream networkStream)
+        {
+            const string selections = "0123456789";
+            Random random = new Random();
+            Payload outputClientIdPayLoad = new Payload();
+            outputClientIdPayLoad.clientId = new string(Enumerable.Repeat(selections, 2).Select(s => s[random.Next(s.Length)]).ToArray());
 
-		private void sendToResultQueue(Payload payload)
+            commUtil.sendPacket(networkStream, outputClientIdPayLoad);
+        }
+
+        private void sendToResultQueue(Payload payload)
 		{
 			throw new NotImplementedException();
 		}
