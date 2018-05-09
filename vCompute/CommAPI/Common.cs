@@ -165,6 +165,11 @@ typeof(Sandboxer).FullName);
 			}
 		}
 
+        public byte[] readAssembly(string assemblyName)
+        {
+            return codeLoader.codeDictionary.readAssembly(assemblyName);
+        }
+
 		public void addToTaskList(string runId)
 		{
 			lock(TaskList)
