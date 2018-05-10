@@ -260,7 +260,7 @@ namespace CommAPI
 				dispatch = taskPayloadDispatch[payload.runId];
 				toId = dispatch.fromClient;
 				fromId = dispatch.toClient;
-				payload.runId = payload.runId.Replace(dispatch.toClient,"");
+				payload.runId = payload.runId.Replace(dispatch.fromClient,"");
 			}
 
 			if (toId != null)
