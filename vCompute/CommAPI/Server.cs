@@ -62,7 +62,7 @@ namespace CommAPI
 			TcpClient client = (TcpClient)clientInfo;
 			NetworkStream networkStream = client.GetStream();
             clientStatistics stats = new clientStatistics(clientList);
-
+            Queue<Payload> payloadQueue = new Queue<Payload>();
             lock (clientList)
             {
                 clientList.Add(stats);
@@ -71,47 +71,65 @@ namespace CommAPI
 
             while (true)
 			{
-				if (networkStream.DataAvailable)
-				{
-					Payload payload = commUtil.getPacket(networkStream);
-					switch (payload.command)
-					{
-						case CommandType.REQUEST:
-						case CommandType.APPEND_REQUEST:
-							sendToExecuteQueue(payload);
-						break;
+                while (networkStream.DataAvailable)
+                {
+                    byte[] buffer = new byte[commUtil.payloadSize];
+                    int readBytes = 0;
+                    readBytes = networkStream.Read(buffer, 0, commUtil.payloadSize);
+                    Payload output = null;
+                    if (readBytes == commUtil.payloadSize)
+                    {
+                        string serializedData = Encoding.UTF8.GetString(buffer);
+                        output = commUtil.preparePayload(serializedData);
+                        payloadQueue.Enqueue(output);
+                    }
+                    if (output != null && output.command != CommandType.STATUS)
+                        Debug.Print("Receiving " + Enum.GetName(typeof(CommandType), output.command));
+                }
+                while(payloadQueue.Count!=0)
+                {
+                    Payload payload = null;
+                    if (payloadQueue != null && payloadQueue.Count > 0)
+                        payload = payloadQueue.Dequeue();
 
-						case CommandType.RESULT:
-						case CommandType.APPEND_RESULT:
-							sendToResultQueue(payload);
-						break;
+                    switch (payload.command)
+                    {
+                        case CommandType.REQUEST:
+                        case CommandType.APPEND_REQUEST:
+                            sendToExecuteQueue(payload);
+                            break;
 
-						case CommandType.REGISTER_CLIENT:
-							doRegisterClient(payload,networkStream);
-						break;
+                        case CommandType.RESULT:
+                        case CommandType.APPEND_RESULT:
+                            sendToResultQueue(payload);
+                            break;
 
-						case CommandType.REGISTER_ASSEMBLY:
-							doRegisterAssembly(payload, networkStream);
-						break;
+                        case CommandType.REGISTER_CLIENT:
+                            doRegisterClient(payload, networkStream);
+                            break;
 
-						case CommandType.UPLOAD_ASSEMBLY:
-						case CommandType.APPEND_ASSEMBLY:
-							doSaveAssembly(payload);
-						break;
+                        case CommandType.REGISTER_ASSEMBLY:
+                            doRegisterAssembly(payload, networkStream);
+                            break;
 
-						case CommandType.DOWNLOAD:
-							doSendAssembly(payload, networkStream);
-						break;
+                        case CommandType.UPLOAD_ASSEMBLY:
+                        case CommandType.APPEND_ASSEMBLY:
+                            doSaveAssembly(payload);
+                            break;
+
+                        case CommandType.DOWNLOAD:
+                            doSendAssembly(payload, networkStream);
+                            break;
 
                         case CommandType.STATUS:
                             updateStatus(payload, stats);
-                        break;
+                            break;
                     }
+                }
 					//Console.WriteLine(payload.clientId + " " + payload.command + " " + payload.cpuUsage + " " + payload.memUsage);
                     Thread.Sleep(150);
 				}
 			}
-		}
 
         private void updateStatus(Payload payload, clientStatistics stats)
         {
@@ -186,6 +204,12 @@ namespace CommAPI
             Payload outputClientIdPayLoad = new Payload();
             outputClientIdPayLoad.command = CommandType.CLIENT_REGISTRTION;
             outputClientIdPayLoad.clientId = ClientId;
+            RegisterClientEventArgs args = new RegisterClientEventArgs();
+            args.ClientId = ClientId;
+            var e = registerClientEvent;
+            if (e != null)
+                e.Invoke(args);
+
             commUtil.sendPacket(networkStream, outputClientIdPayLoad);
             if (!taskPayLoad.ContainsKey(outputClientIdPayLoad.clientId))
 	        {
@@ -195,9 +219,7 @@ namespace CommAPI
 				ClientNo++;
 			}
 
-            RegisterClientEventArgs args = new RegisterClientEventArgs();
-            args.ClientId = ClientId;
-            var e = registerClientEvent;
+            args.ClientId = ClientId+" second";
             if (e!=null)
             e.Invoke(args);
 

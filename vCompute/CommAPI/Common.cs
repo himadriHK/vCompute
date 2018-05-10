@@ -10,6 +10,7 @@ using System.Security;
 using System.Security.Policy;
 using System.Diagnostics;
 using System.Runtime.Remoting;
+using System.Threading;
 
 namespace CommAPI
 {
@@ -17,8 +18,9 @@ namespace CommAPI
 	public class Common
 	{
 		
-		private const int payloadSize = 5120;
-		private const double assemblySize = 200.0;
+		public int payloadSize = 5120;
+		public double assemblySize = 200.0;
+        public Queue<Payload> payloadsFromClients =new Queue<Payload>();
 		private Dictionary<string, Payload> TaskList;
 		public Loader codeLoader;
 		private int timeOut=60;
@@ -188,27 +190,35 @@ namespace CommAPI
 			TaskList.Add(runId, null);
 		}
 
-		public Payload getPacket(NetworkStream stream)
-		{
-				byte[] buffer = new byte[payloadSize];
-                int readBytes = 0;
-                readBytes=stream.Read(buffer, 0, payloadSize);
-                Payload output;
-                if (readBytes == payloadSize)
-                {
-                    string serializedData = Encoding.UTF8.GetString(buffer);
-                    output = preparePayload(serializedData);
-                }
-                else
-                {
-                    Debug.Print("*******************NULLLL******");
-                    output = new Payload();
-                    output.command = CommandType.NOTHING;
-                }
-				if (output!=null && output.command != CommandType.STATUS)
-					Debug.Print("Receiving " + Enum.GetName(typeof(CommandType), output.command));
-				return output;
-		}
+	//	public Payload getPacket()
+	//	{
+    //        if (payloadsFromClients != null && payloadsFromClients.Count > 0)
+    //            return payloadsFromClients.Dequeue();
+    //        else
+    //            return null;
+    //    }
+   // public void collectPayloads(NetworkStream network)
+   //     {
+   //         while (true)
+   //         {
+   //             while (network.DataAvailable)
+   //             {
+   //                 byte[] buffer = new byte[payloadSize];
+   //                 int readBytes = 0;
+   //                 readBytes = network.Read(buffer, 0, payloadSize);
+   //                 Payload output=null;
+   //                 if (readBytes == payloadSize)
+   //                 {
+   //                     string serializedData = Encoding.UTF8.GetString(buffer);
+   //                     output = preparePayload(serializedData);
+   //                     var clientID = output.clientId;
+   //                         payloadsFromClients.Enqueue(output);
+   //                 }
+   //                 if (output != null && output.command != CommandType.STATUS)
+   //                     Debug.Print("Receiving " + Enum.GetName(typeof(CommandType), output.command));
+   //             }
+   //         }
+   //     }
 	}
 
 	[Serializable]

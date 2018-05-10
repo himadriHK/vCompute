@@ -41,13 +41,12 @@ namespace CommAPI
 			{
 			clientInstance.Connect(hostAddress, port);
 			if(clientInstance.Connected)
-			
 			Debug.WriteLine("Client Connected");
 			networkDataStream = clientInstance.GetStream();
 			Thread pingThread = new Thread(pingHandler);
 			Thread dispatcher = new Thread(serverMessageHandler);
 			pingThread.Start();
-			dispatcher.Start();
+			dispatcher.Start(networkDataStream);
 			}
 			catch(Exception ex)
 			{
@@ -55,37 +54,57 @@ namespace CommAPI
 			}
 		}
 
-		private void serverMessageHandler()
+		private void serverMessageHandler(object networkDataStream)
 		{
-			while (true)
+            Queue<Payload> payloadQueue = new Queue<Payload>();
+            NetworkStream networkStream = (NetworkStream)networkDataStream;
+            while (true)
 			{
-				if (networkDataStream.DataAvailable)
-				{
-					Payload payload = commUtil.getPacket(networkDataStream);
-					if(payload.command!=CommandType.STATUS)
-					Debug.Print("Printing Client " + payload.command);
-					switch (payload.command)
-					{
-						case CommandType.DOWNLOAD:
-						case CommandType.APPEND_ASSEMBLY:
-							commUtil.StoreAssembly(payload.assemblyName, payload.assemblyBytes, payload.isAppend, payload.remainingPayloads);
-							break;
+                while (networkStream.DataAvailable)
+                {
+                    byte[] buffer = new byte[commUtil.payloadSize];
+                    int readBytes = 0;
+                    readBytes = networkStream.Read(buffer, 0, commUtil.payloadSize);
+                    Payload output = null;
+                    if (readBytes == commUtil.payloadSize)
+                    {
+                        string serializedData = Encoding.UTF8.GetString(buffer);
+                        output = commUtil.preparePayload(serializedData);
+                        payloadQueue.Enqueue(output);
+                    }
+                    if (output != null && output.command != CommandType.STATUS)
+                        Debug.Print("Receiving " + Enum.GetName(typeof(CommandType), output.command));
+                }
+                while (payloadQueue.Count != 0)
+                {
+                    Payload payload = null;
+                    if (payloadQueue != null && payloadQueue.Count > 0)
+                        payload = payloadQueue.Dequeue();
 
-						case CommandType.EXECUTE:
-						case CommandType.APPEND_EXECUTE:
-							executeTask(payload);
-							break;
+                    if (payload.command != CommandType.STATUS)
+                        Debug.Print("Printing Client " + payload.command);
+                    switch (payload.command)
+                    {
+                        case CommandType.DOWNLOAD:
+                        case CommandType.APPEND_ASSEMBLY:
+                            commUtil.StoreAssembly(payload.assemblyName, payload.assemblyBytes, payload.isAppend, payload.remainingPayloads);
+                            break;
 
-						case CommandType.RESULT:
-						case CommandType.APPEND_RESULT:
-							commUtil.storeResult(payload.assemblyName, payload.runId, payload.jsonOutput, payload.isAppend, payload.remainingPayloads);
-							break;
+                        case CommandType.EXECUTE:
+                        case CommandType.APPEND_EXECUTE:
+                            executeTask(payload);
+                            break;
+
+                        case CommandType.RESULT:
+                        case CommandType.APPEND_RESULT:
+                            commUtil.storeResult(payload.assemblyName, payload.runId, payload.jsonOutput, payload.isAppend, payload.remainingPayloads);
+                            break;
 
                         case CommandType.CLIENT_REGISTRTION:
                             setClientID(payload);
                             break;
-					}
-				}
+                    }
+                }
                 Thread.Sleep(150);
 			}
 		}
