@@ -24,9 +24,12 @@ namespace CommAPI
 		private Common commUtil;
 		private int runID;
 		private Dictionary<string, Payload> execData;
+        public EventArgs e = null;
+        //public delegate void RegisterClientHandlerFromClient(Server sender, RegisterClientEventArgs e);
+        //public event RegisterClientHandlerFromClient registerClientEvent;
 
-		//client constructor
-		public Client(string host,int port)
+        //client constructor
+        public Client(string host,int port)
 		{
 			hostAddress = host;
 			this.port = port;

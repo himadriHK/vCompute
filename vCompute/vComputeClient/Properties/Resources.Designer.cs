@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace vComputeClient.Properties
+namespace vComputeClient1.Properties
 {
 
 

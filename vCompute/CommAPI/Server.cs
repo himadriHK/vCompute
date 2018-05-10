@@ -20,7 +20,16 @@ namespace CommAPI
 		public Dictionary<string, payloadDispatch> taskPayloadDispatch = new Dictionary<string, payloadDispatch>();
 		private List<clientStatistics> clientList;
 		public static int ClientNo = 1;
-		 public Server(int port)
+        public delegate void RegisterClientHandler(RegisterClientEventArgs e);
+        public event RegisterClientHandler registerClientEvent;
+        public delegate void UpdateStatusHandler(UpdateStatusEventArgs e);
+        public event UpdateStatusHandler updateStatusEvent;
+        public delegate void ExecuteHandler(ExectueEventArgs e);
+        public event ExecuteHandler executeEvent;
+        public delegate void ResultHandler(ResultEventArgs e);
+        public event ResultHandler resultEvent;
+
+        public Server(int port)
 		{
 			this.port = port;
 			commUtil = new Common(AppDomain.CurrentDomain.BaseDirectory+@"server.bin");
@@ -110,6 +119,13 @@ namespace CommAPI
             double load = (payload.cpuUsage + payload.memUsage) / 2;
             stats.Load = (stats.Load+ load)/2;
             stats.Name = payload.clientId;
+
+            UpdateStatusEventArgs args = new UpdateStatusEventArgs();
+            args.ClientId = stats.Name;
+            args.load = stats.Load;
+            var e = updateStatusEvent;
+            if (e != null)
+                e.Invoke(args);
         }
 
         private void doSendAssembly(Payload payload, NetworkStream networkDataStream)
@@ -166,7 +182,13 @@ namespace CommAPI
 				newClientThreadStart.Start();
 				ClientNo++;
 			}
-			
+
+            RegisterClientEventArgs args = new RegisterClientEventArgs();
+            args.ClientId = ClientId;
+            var e = registerClientEvent;
+            if (e!=null)
+            e.Invoke(args);
+
         }
 
 		private void sendPacketsToClient(string clientId, NetworkStream networkStream)
@@ -198,7 +220,19 @@ namespace CommAPI
 			{
 				var requestQueue = taskPayLoad[toId];
 				requestQueue.Enqueue(payload);
-			}
+                if (payload.remainingPayloads == 0 && payload.isAppend == false)
+                {
+                   ResultEventArgs args = new ResultEventArgs()
+                   {
+                       FromClientId = dispatch.fromClient,
+                       ToClientId = dispatch.toClient,
+                       RunId = dispatch.runId
+                   };
+                    var e = resultEvent;
+                    if (e != null)
+                        e.Invoke(args);
+                }
+            }
 		}
 
 		private void sendToExecuteQueue(Payload payload)
@@ -228,6 +262,18 @@ namespace CommAPI
 
 			var Q = taskPayLoad[toId];
 			Q.Enqueue(payload);
+            if(payload.remainingPayloads == 0 && payload.isAppend == false)
+            {
+                ExectueEventArgs args = new ExectueEventArgs()
+                {
+                    FromClientId = payload.clientId,
+                    ToClientId = toId,
+                    RunId = runId
+                };
+                var e = executeEvent;
+                if (e != null)
+                    e.Invoke(args);
+            }  
 		}
 	}
 
@@ -270,4 +316,30 @@ namespace CommAPI
 			return Load.CompareTo(other.Load);
 		}
 	}
+    public class RegisterClientEventArgs : EventArgs
+    {
+        public string ClientId { get; set; }
+    }
+
+    public class UpdateStatusEventArgs : EventArgs
+    {
+        public string ClientId { get; set; }
+        public double load { get; set; }
+    }
+
+    public class ExectueEventArgs : EventArgs
+    {
+        public string FromClientId { get; set; }
+        public string ToClientId { get; set; }
+        public string RunId { get; set; }
+
+    }
+
+    public class ResultEventArgs : EventArgs
+    {
+        public string FromClientId { get; set; }
+        public string ToClientId { get; set; }
+        public string RunId { get; set; }
+    }
+
 }

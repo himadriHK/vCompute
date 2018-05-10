@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace vComputeServer
+namespace vComputeClient
 {
 	public partial class Form1 : Form
 	{
@@ -47,11 +47,6 @@ namespace vComputeServer
         {
             client = new Client(TxtHostName.Text, 8080);
             client.registerClient();
-            Thread.Sleep(1000);
-            lblclientID.Text = client.clientId;
-            TxtHostName.Enabled = false;
-            btnStartClient.Enabled = false;
-
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -81,6 +76,16 @@ namespace vComputeServer
         {
             if (TxtHostName.Text.Trim().Length > 0)
                 btnStartClient.Enabled = true;
+        }
+        public void Subscribe(Server s)
+        {
+            s.registerClientEvent += new Server.RegisterClientHandler(OnClientRegistration);
+        }
+        private void OnClientRegistration(RegisterClientEventArgs e)
+        {
+            lblclientID.Text = e.ClientId;
+            TxtHostName.Enabled = false;
+            btnStartClient.Enabled = false;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace vComputeServer
+﻿namespace vComputeClient
 {
 	partial class Form1
 	{
