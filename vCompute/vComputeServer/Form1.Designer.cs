@@ -41,6 +41,8 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
+            this.TxtHostName = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label4
@@ -107,9 +109,9 @@
             // 
             // btnStartClient
             // 
-            this.btnStartClient.Location = new System.Drawing.Point(310, 552);
+            this.btnStartClient.Location = new System.Drawing.Point(705, 523);
             this.btnStartClient.Name = "btnStartClient";
-            this.btnStartClient.Size = new System.Drawing.Size(193, 23);
+            this.btnStartClient.Size = new System.Drawing.Size(117, 23);
             this.btnStartClient.TabIndex = 14;
             this.btnStartClient.Text = "Start Client";
             this.btnStartClient.UseVisualStyleBackColor = true;
@@ -118,7 +120,7 @@
             // lblclienttext
             // 
             this.lblclienttext.AutoSize = true;
-            this.lblclienttext.Location = new System.Drawing.Point(47, 20);
+            this.lblclienttext.Location = new System.Drawing.Point(39, 20);
             this.lblclienttext.Name = "lblclienttext";
             this.lblclienttext.Size = new System.Drawing.Size(76, 13);
             this.lblclienttext.TabIndex = 15;
@@ -158,11 +160,30 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // TxtHostName
+            // 
+            this.TxtHostName.Location = new System.Drawing.Point(503, 523);
+            this.TxtHostName.Name = "TxtHostName";
+            this.TxtHostName.Size = new System.Drawing.Size(172, 20);
+            this.TxtHostName.TabIndex = 20;
+            this.TxtHostName.TextChanged += new System.EventHandler(this.TxtHostName_TextChanged);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(419, 526);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(60, 13);
+            this.label6.TabIndex = 21;
+            this.label6.Text = "Host Name";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(843, 645);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.TxtHostName);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.textBox2);
@@ -200,6 +221,8 @@
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.TextBox TxtHostName;
+        private System.Windows.Forms.Label label6;
     }
 }
 
