@@ -47,7 +47,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(481, 84);
+            this.label3.Location = new System.Drawing.Point(481, 45);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(70, 13);
             this.label3.TabIndex = 12;
@@ -56,7 +56,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 84);
+            this.label2.Location = new System.Drawing.Point(9, 45);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(106, 13);
             this.label2.TabIndex = 11;
@@ -64,9 +64,9 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 552);
+            this.button1.Location = new System.Drawing.Point(12, 553);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(227, 23);
+            this.button1.Size = new System.Drawing.Size(227, 42);
             this.button1.TabIndex = 8;
             this.button1.Text = "Upload Assembly";
             this.button1.UseVisualStyleBackColor = true;
@@ -74,18 +74,18 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(12, 121);
+            this.textBox1.Location = new System.Drawing.Point(12, 61);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(422, 379);
+            this.textBox1.Size = new System.Drawing.Size(422, 439);
             this.textBox1.TabIndex = 7;
             // 
             // btnStartClient
             // 
-            this.btnStartClient.Location = new System.Drawing.Point(705, 523);
+            this.btnStartClient.Location = new System.Drawing.Point(12, 601);
             this.btnStartClient.Name = "btnStartClient";
-            this.btnStartClient.Size = new System.Drawing.Size(117, 23);
+            this.btnStartClient.Size = new System.Drawing.Size(787, 41);
             this.btnStartClient.TabIndex = 14;
             this.btnStartClient.Text = "Start Client";
             this.btnStartClient.UseVisualStyleBackColor = true;
@@ -94,7 +94,7 @@
             // lblclienttext
             // 
             this.lblclienttext.AutoSize = true;
-            this.lblclienttext.Location = new System.Drawing.Point(39, 20);
+            this.lblclienttext.Location = new System.Drawing.Point(9, 20);
             this.lblclienttext.Name = "lblclienttext";
             this.lblclienttext.Size = new System.Drawing.Size(76, 13);
             this.lblclienttext.TabIndex = 15;
@@ -126,9 +126,9 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(12, 592);
+            this.button2.Location = new System.Drawing.Point(313, 553);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(227, 23);
+            this.button2.Size = new System.Drawing.Size(227, 42);
             this.button2.TabIndex = 19;
             this.button2.Text = "Request Task";
             this.button2.UseVisualStyleBackColor = true;
@@ -136,16 +136,16 @@
             // 
             // TxtHostName
             // 
-            this.TxtHostName.Location = new System.Drawing.Point(503, 523);
+            this.TxtHostName.Location = new System.Drawing.Point(484, 523);
             this.TxtHostName.Name = "TxtHostName";
-            this.TxtHostName.Size = new System.Drawing.Size(172, 20);
+            this.TxtHostName.Size = new System.Drawing.Size(215, 20);
             this.TxtHostName.TabIndex = 20;
             this.TxtHostName.TextChanged += new System.EventHandler(this.TxtHostName_TextChanged);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(419, 526);
+            this.label6.Location = new System.Drawing.Point(374, 528);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(60, 13);
             this.label6.TabIndex = 21;
@@ -154,20 +154,20 @@
             // AssemblyList
             // 
             this.AssemblyList.FormattingEnabled = true;
-            this.AssemblyList.Location = new System.Drawing.Point(484, 122);
+            this.AssemblyList.IntegralHeight = false;
+            this.AssemblyList.Location = new System.Drawing.Point(484, 61);
             this.AssemblyList.Name = "AssemblyList";
-            this.AssemblyList.Size = new System.Drawing.Size(241, 381);
+            this.AssemblyList.Size = new System.Drawing.Size(241, 442);
             this.AssemblyList.TabIndex = 22;
             this.AssemblyList.SelectedIndexChanged += new System.EventHandler(this.AssemblyList_SelectedIndexChanged);
             // 
             // btnshowassemblies
             // 
-            this.btnshowassemblies.Location = new System.Drawing.Point(625, 80);
+            this.btnshowassemblies.Location = new System.Drawing.Point(602, 553);
             this.btnshowassemblies.Name = "btnshowassemblies";
-            this.btnshowassemblies.Size = new System.Drawing.Size(164, 23);
+            this.btnshowassemblies.Size = new System.Drawing.Size(197, 42);
             this.btnshowassemblies.TabIndex = 23;
-            this.btnshowassemblies.Text = "show available assemblies";
-            this.btnshowassemblies.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnshowassemblies.Text = "Show Available Assemblies";
             this.btnshowassemblies.UseVisualStyleBackColor = true;
             this.btnshowassemblies.Click += new System.EventHandler(this.btnshowassemblies_Click);
             // 
@@ -175,7 +175,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(843, 645);
+            this.ClientSize = new System.Drawing.Size(816, 645);
             this.Controls.Add(this.btnshowassemblies);
             this.Controls.Add(this.AssemblyList);
             this.Controls.Add(this.label6);

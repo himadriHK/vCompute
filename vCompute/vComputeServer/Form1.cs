@@ -112,6 +112,7 @@ namespace vComputeClient
         {
             this.AssemblyList.Visible = true;
             this.AssemblyList.DataSource = client.GetAssemblyList();
+            btnshowassemblies.Text = "Refresh Assemblies";
         }
 
         private void AssemblyList_SelectedIndexChanged(object sender, EventArgs e)

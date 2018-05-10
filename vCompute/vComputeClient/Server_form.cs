@@ -15,6 +15,8 @@ namespace vComputeServer
     public partial class Server_form : Form
     {
         delegate void StringArgReturningVoidDelegate(string text, MessageType type);
+        delegate void listItemAddDelegate(ListViewItem item);
+        delegate void listItemColorDelegate(int indes,Color col);
         Server server;
         public Server_form()
         {
@@ -36,7 +38,7 @@ namespace vComputeServer
         public void Subscribe(Server s)
         {
             s.registerClientEvent += new Server.RegisterClientHandler(OnClientRegistration);
-           // s.updateStatusEvent += new Server.UpdateStatusHandler(OnUpdateStatus);
+            s.updateStatusEvent += new Server.UpdateStatusHandler(OnUpdateStatus);
             s.executeEvent += new Server.ExecuteHandler(OnExecuteStatus);
             s.resultEvent += new Server.ResultHandler(OnResultStatus);
             s.uploadEvent += new Server.UploadHandler(OnUploadAssembly);
@@ -51,10 +53,26 @@ namespace vComputeServer
         private void OnClientRegistration(RegisterClientEventArgs e)
         {
             SetText(string.Format("New Client {0} has been registered", e.ClientId), MessageType.Success);
+            ListViewItem newItem = new ListViewItem("        " + e.ClientId + "           ");
+            newItem.Font = new Font("Consolas", 9.75F, FontStyle.Bold);
+            AddListItem(newItem);
         }
         private void OnUpdateStatus(UpdateStatusEventArgs e)
         {
             //SetText(string.Format("Recieved Status Update from {0}. Load is {1}", e.ClientId, e.load), MessageType.Information);
+            Color col;
+            if (e.load < 30)
+                col = Color.Green;
+            else if (e.load < 50)
+                col = Color.DarkGreen;
+            else if (e.load < 70)
+                col = Color.Orange;
+            else
+                col = Color.Red;
+
+            int id = Int32.Parse(e.ClientId.Replace("Client",""))-1;
+            ColorListItem(id, col);
+
         }
 
         private void OnExecuteStatus(ExectueEventArgs e)
@@ -100,10 +118,42 @@ namespace vComputeServer
             }
         }
 
+        private void AddListItem(ListViewItem item)
+        {
+            if (this.listView1.InvokeRequired)
+            {
+                listItemAddDelegate d = new listItemAddDelegate(AddListItem);
+                this.Invoke(d, new object[] { item });
+            }
+            else
+            {
+                this.listView1.Items.Add(item);
+            }
+        }
+
+        private void ColorListItem(int index,Color col)
+        {
+            if (this.listView1.InvokeRequired)
+            {
+                listItemColorDelegate d = new listItemColorDelegate(ColorListItem);
+                this.Invoke(d, new object[] { index,col });
+            }
+            else
+            {
+                this.listView1.Items[index].BackColor=col;
+            }
+        }
+
         private void btnShowAssemblies_Click(object sender, EventArgs e)
         {
             this.AssemblyList.Visible = true;
             AssemblyList.DataSource = server.GetAssembliesList();
+            btnShowAssemblies.Text = "Refresh Assemblies";
+        }
+
+        private void logtxt_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
