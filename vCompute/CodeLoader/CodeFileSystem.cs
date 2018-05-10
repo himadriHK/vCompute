@@ -45,8 +45,13 @@ namespace CodeLoader
 			else
 				return new byte[] { };
 		}
-		
-		public string[] getAssemblyList()
+
+        public bool containsAssembly(string assemblyName)
+        {
+            if (codeDictionary.ContainsKey(assemblyName) && codeStoreStatus.ContainsKey(assemblyName) && codeStoreStatus[assemblyName] == -1)
+                return true; else { return false; }
+        }
+        public string[] getAssemblyList()
 		{
 			return codeDictionary.Keys.ToArray<string>();
 		}
