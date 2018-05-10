@@ -30,6 +30,8 @@
         {
             this.btnServerStart = new System.Windows.Forms.Button();
             this.logtxt = new System.Windows.Forms.RichTextBox();
+            this.AssemblyList = new System.Windows.Forms.ListBox();
+            this.btnShowAssemblies = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnServerStart
@@ -50,11 +52,31 @@
             this.logtxt.TabIndex = 1;
             this.logtxt.Text = "";
             // 
+            // AssemblyList
+            // 
+            this.AssemblyList.FormattingEnabled = true;
+            this.AssemblyList.Location = new System.Drawing.Point(772, 25);
+            this.AssemblyList.Name = "AssemblyList";
+            this.AssemblyList.Size = new System.Drawing.Size(224, 459);
+            this.AssemblyList.TabIndex = 2;
+            // 
+            // btnShowAssemblies
+            // 
+            this.btnShowAssemblies.Location = new System.Drawing.Point(791, 536);
+            this.btnShowAssemblies.Name = "btnShowAssemblies";
+            this.btnShowAssemblies.Size = new System.Drawing.Size(166, 23);
+            this.btnShowAssemblies.TabIndex = 3;
+            this.btnShowAssemblies.Text = "Show Assemblies";
+            this.btnShowAssemblies.UseVisualStyleBackColor = true;
+            this.btnShowAssemblies.Click += new System.EventHandler(this.btnShowAssemblies_Click);
+            // 
             // Server_form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(749, 603);
+            this.ClientSize = new System.Drawing.Size(1100, 603);
+            this.Controls.Add(this.btnShowAssemblies);
+            this.Controls.Add(this.AssemblyList);
             this.Controls.Add(this.logtxt);
             this.Controls.Add(this.btnServerStart);
             this.Name = "Server_form";
@@ -68,5 +90,7 @@
 
         private System.Windows.Forms.Button btnServerStart;
         private System.Windows.Forms.RichTextBox logtxt;
+        private System.Windows.Forms.ListBox AssemblyList;
+        private System.Windows.Forms.Button btnShowAssemblies;
     }
 }

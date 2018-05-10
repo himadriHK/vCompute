@@ -215,6 +215,11 @@ namespace CommAPI
 			}
 		}
 
+        public List<string> GetAssemblyList()
+        {
+            return commUtil.GetAllAssemblies();
+        }
+
 		private void executeTask(Payload incoming)
 		{
 			if (!commUtil.codeLoader.codeDictionary.ContainsAssembly(incoming.assemblyName))

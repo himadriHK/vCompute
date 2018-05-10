@@ -23,6 +23,7 @@ namespace vComputeClient
         public Form1()
 		{
 			InitializeComponent();
+            this.AssemblyList.Visible = false;
 		}
 
         public byte[] complieAssembly(string sourceFile)
@@ -105,6 +106,17 @@ namespace vComputeClient
             {
                 this.lblclientID.Text = text;
             }
+        }
+
+        private void btnshowassemblies_Click(object sender, EventArgs e)
+        {
+            this.AssemblyList.Visible = true;
+            this.AssemblyList.DataSource = client.GetAssemblyList();
+        }
+
+        private void AssemblyList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.textBox2.Text = this.AssemblyList.GetItemText(AssemblyList.SelectedItem);
         }
     }
 }

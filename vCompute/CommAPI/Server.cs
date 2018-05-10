@@ -42,6 +42,10 @@ namespace CommAPI
 			acceptConnections.Start();
 		}
 
+        public List<string> GetAssembliesList()
+        {
+            return commUtil.GetAllAssemblies();
+        }
 		private void processConnections()
 		{
 			while (true)

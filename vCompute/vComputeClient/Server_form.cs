@@ -15,19 +15,22 @@ namespace vComputeServer
     public partial class Server_form : Form
     {
         delegate void StringArgReturningVoidDelegate(string text, MessageType type);
+        Server server;
         public Server_form()
         {
             InitializeComponent();
             this.logtxt.BackColor = Color.Black;
+            this.AssemblyList.Visible = false;
         }
 
         private void btnServerStart_Click(object sender, EventArgs e)
         {
-            Server server = new Server(8080);
+            server = new Server(8080);
             Subscribe(server);
             SetText("Server Started", MessageType.Success);
             btnServerStart.BackColor = Color.Green;
             btnServerStart.Enabled = false;
+            
         }
 
         public void Subscribe(Server s)
@@ -90,5 +93,10 @@ namespace vComputeServer
             }
         }
 
+        private void btnShowAssemblies_Click(object sender, EventArgs e)
+        {
+            this.AssemblyList.Visible = true;
+            AssemblyList.DataSource = server.GetAssembliesList();
+        }
     }
 }
