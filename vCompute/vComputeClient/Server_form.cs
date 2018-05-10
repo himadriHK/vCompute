@@ -30,7 +30,7 @@ namespace vComputeServer
         public void Subscribe(Server s)
         {
             s.registerClientEvent += new Server.RegisterClientHandler(OnClientRegistration);
-            s.updateStatusEvent += new Server.UpdateStatusHandler(OnUpdateStatus);
+           // s.updateStatusEvent += new Server.UpdateStatusHandler(OnUpdateStatus);
             s.executeEvent += new Server.ExecuteHandler(OnExecuteStatus);
             s.resultEvent += new Server.ResultHandler(OnResultStatus);
         }

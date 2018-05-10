@@ -105,7 +105,7 @@ namespace CommAPI
                             updateStatus(payload, stats);
                         break;
                     }
-					Console.WriteLine(payload.clientId + " " + payload.command + " " + payload.cpuUsage + " " + payload.memUsage);
+					//Console.WriteLine(payload.clientId + " " + payload.command + " " + payload.cpuUsage + " " + payload.memUsage);
                     Thread.Sleep(150);
 				}
 			}
@@ -195,10 +195,11 @@ namespace CommAPI
 		{
 			var Q = taskPayLoad[clientId];
 			while(true)
-			lock (Q)
+//			lock (Q)
 			{
                 while(Q.Count>0)
 					commUtil.sendPacket(networkStream,Q.Dequeue());
+                Thread.Sleep(300);
 			}
 		}
 
