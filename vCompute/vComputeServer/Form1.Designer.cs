@@ -28,11 +28,8 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-            this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             this.button1 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.btnStartClient = new System.Windows.Forms.Button();
@@ -43,25 +40,18 @@
             this.button2 = new System.Windows.Forms.Button();
             this.TxtHostName = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
+            this.AssemblyList = new System.Windows.Forms.ListBox();
+            this.btnshowassemblies = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(638, 84);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(37, 13);
-            this.label4.TabIndex = 13;
-            this.label4.Text = "Result";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(457, 84);
+            this.label3.Location = new System.Drawing.Point(481, 84);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(82, 13);
+            this.label3.Size = new System.Drawing.Size(70, 13);
             this.label3.TabIndex = 12;
-            this.label3.Text = "Tasks in Queue";
+            this.label3.Text = "Assembly List";
             // 
             // label2
             // 
@@ -71,22 +61,6 @@
             this.label2.Size = new System.Drawing.Size(106, 13);
             this.label2.TabIndex = 11;
             this.label2.Text = "Write your code here";
-            // 
-            // label1
-            // 
-            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label1.Location = new System.Drawing.Point(629, 121);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(158, 376);
-            this.label1.TabIndex = 10;
-            // 
-            // checkedListBox1
-            // 
-            this.checkedListBox1.FormattingEnabled = true;
-            this.checkedListBox1.Location = new System.Drawing.Point(460, 121);
-            this.checkedListBox1.Name = "checkedListBox1";
-            this.checkedListBox1.Size = new System.Drawing.Size(126, 379);
-            this.checkedListBox1.TabIndex = 9;
             // 
             // button1
             // 
@@ -177,11 +151,33 @@
             this.label6.TabIndex = 21;
             this.label6.Text = "Host Name";
             // 
+            // AssemblyList
+            // 
+            this.AssemblyList.FormattingEnabled = true;
+            this.AssemblyList.Location = new System.Drawing.Point(484, 122);
+            this.AssemblyList.Name = "AssemblyList";
+            this.AssemblyList.Size = new System.Drawing.Size(241, 381);
+            this.AssemblyList.TabIndex = 22;
+            this.AssemblyList.SelectedIndexChanged += new System.EventHandler(this.AssemblyList_SelectedIndexChanged);
+            // 
+            // btnshowassemblies
+            // 
+            this.btnshowassemblies.Location = new System.Drawing.Point(625, 80);
+            this.btnshowassemblies.Name = "btnshowassemblies";
+            this.btnshowassemblies.Size = new System.Drawing.Size(164, 23);
+            this.btnshowassemblies.TabIndex = 23;
+            this.btnshowassemblies.Text = "show available assemblies";
+            this.btnshowassemblies.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnshowassemblies.UseVisualStyleBackColor = true;
+            this.btnshowassemblies.Click += new System.EventHandler(this.btnshowassemblies_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(843, 645);
+            this.Controls.Add(this.btnshowassemblies);
+            this.Controls.Add(this.AssemblyList);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.TxtHostName);
             this.Controls.Add(this.button2);
@@ -190,11 +186,8 @@
             this.Controls.Add(this.lblclientID);
             this.Controls.Add(this.lblclienttext);
             this.Controls.Add(this.btnStartClient);
-            this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.checkedListBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.textBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -208,12 +201,8 @@
 		}
 
 		#endregion
-
-		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.CheckedListBox checkedListBox1;
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button btnStartClient;
@@ -224,6 +213,8 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TextBox TxtHostName;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ListBox AssemblyList;
+        private System.Windows.Forms.Button btnshowassemblies;
     }
 }
 

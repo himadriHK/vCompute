@@ -197,6 +197,11 @@ namespace CommAPI
 			TaskList.Add(runId, null);
 		}
 
+        public List<string> GetAllAssemblies()
+        {
+            return codeLoader.codeDictionary.GetAssemblyList().ToList();
+        }
+
 	//	public Payload getPacket()
 	//	{
     //        if (payloadsFromClients != null && payloadsFromClients.Count > 0)
