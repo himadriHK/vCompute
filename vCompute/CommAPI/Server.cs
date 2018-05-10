@@ -160,12 +160,12 @@ namespace CommAPI
 
 		private void doSaveAssembly(Payload payload)
 		{
-            commUtil.storeAssembly(payload.assemblyName, payload.assemblyBytes, payload.isAppend, payload.remainingPayloads);
+            commUtil.StoreAssembly(payload.assemblyName, payload.assemblyBytes, payload.isAppend, payload.remainingPayloads);
         }
 
 		private void doRegisterAssembly(Payload payload, NetworkStream networkstream)
 		{
-            commUtil.storeAssembly(payload.assemblyName, new byte[0], false,0);
+            commUtil.StoreAssembly(payload.assemblyName, new byte[0], false,0);
         }
 
         private void doRegisterClient(Payload payload, NetworkStream networkStream)

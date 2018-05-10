@@ -47,22 +47,22 @@ namespace CommAPI
 			tempDomain.Load("CodeLoader");
 
 			if (assemblyName.ToLower() == "discovery")
-				return string.Join(",", codeLoader.codeDictionary.getAssemblyList());
+				return string.Join(",", codeLoader.codeDictionary.GetAssemblyList());
 
 			ObjectHandle handle = Activator.CreateInstanceFrom(tempDomain, typeof(Sandboxer).Assembly.ManifestModule.FullyQualifiedName,typeof(Sandboxer).FullName);
 
 			Sandboxer newDomainInstance = (Sandboxer)handle.Unwrap();
 
-			byte[] assemblyBinary = codeLoader.codeDictionary.readAssembly(assemblyName);
+			byte[] assemblyBinary = codeLoader.codeDictionary.ReadAssembly(assemblyName);
 
 			object output = newDomainInstance.ExecuteNewAssembly(assemblyBinary, param);
 
 			return new JavaScriptSerializer().Serialize(output);
 		}
 
-		public void storeAssembly(string assemblyName, byte[] assemblyBinary,bool append=false,int payloadsRemaining=0)
+		public void StoreAssembly(string assemblyName, byte[] assemblyBinary,bool append=false,int payloadsRemaining=0)
 		{
-			codeLoader.codeDictionary.writeAssembly(assemblyName, assemblyBinary, payloadsRemaining);
+			codeLoader.codeDictionary.WriteAssembly(assemblyName, assemblyBinary, payloadsRemaining);
 			codeLoader.saveCodeDictionary();
 			codeLoader.reloadAssemblies();
 		}
@@ -179,7 +179,7 @@ namespace CommAPI
 
         public byte[] readAssembly(string assemblyName)
         {
-            return codeLoader.codeDictionary.readAssembly(assemblyName);
+            return codeLoader.codeDictionary.ReadAssembly(assemblyName);
         }
 
 		public void addToTaskList(string runId)

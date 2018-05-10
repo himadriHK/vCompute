@@ -18,7 +18,7 @@ namespace CodeLoader
 			codeStoreStatus = new Dictionary<string, int>();
 		}
 
-		public int writeAssembly(string assemblyName, byte[] codeBytes,int payloadsRemaining)
+		public int WriteAssembly(string assemblyName, byte[] codeBytes,int payloadsRemaining)
 		{
 			if (!codeDictionary.ContainsKey(assemblyName))
 			{
@@ -38,7 +38,7 @@ namespace CodeLoader
 			return 0;
 		}
 
-		public byte[] readAssembly(string assemblyName)
+		public byte[] ReadAssembly(string assemblyName)
 		{
 			if (codeDictionary.ContainsKey(assemblyName)&& codeStoreStatus.ContainsKey(assemblyName)&& codeStoreStatus[assemblyName]==-1)
 				return codeDictionary[assemblyName];
@@ -46,12 +46,12 @@ namespace CodeLoader
 				return new byte[] { };
 		}
 
-        public bool containsAssembly(string assemblyName)
+        public bool ContainsAssembly(string assemblyName)
         {
             if (codeDictionary.ContainsKey(assemblyName) && codeStoreStatus.ContainsKey(assemblyName) && codeStoreStatus[assemblyName] == -1)
                 return true; else { return false; }
         }
-        public string[] getAssemblyList()
+        public string[] GetAssemblyList()
 		{
 			return codeDictionary.Keys.ToArray<string>();
 		}

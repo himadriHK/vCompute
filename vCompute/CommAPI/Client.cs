@@ -68,7 +68,7 @@ namespace CommAPI
 					{
 						case CommandType.DOWNLOAD:
 						case CommandType.APPEND_ASSEMBLY:
-							commUtil.storeAssembly(payload.assemblyName, payload.assemblyBytes, payload.isAppend, payload.remainingPayloads);
+							commUtil.StoreAssembly(payload.assemblyName, payload.assemblyBytes, payload.isAppend, payload.remainingPayloads);
 							break;
 
 						case CommandType.EXECUTE:
@@ -193,9 +193,9 @@ namespace CommAPI
 
 		private void executeTask(Payload incoming)
 		{
-            if (!commUtil.codeLoader.codeDictionary.containsAssembly(incoming.assemblyName))
+            if (!commUtil.codeLoader.codeDictionary.ContainsAssembly(incoming.assemblyName))
                 downloadAssembly(incoming.assemblyName);
-            while (!commUtil.codeLoader.codeDictionary.containsAssembly(incoming.assemblyName)) ;
+            while (!commUtil.codeLoader.codeDictionary.ContainsAssembly(incoming.assemblyName)) ;
 
             if (execData.ContainsKey(incoming.runId))
 			{
