@@ -28,6 +28,8 @@ namespace CommAPI
         public event ExecuteHandler executeEvent;
         public delegate void ResultHandler(ResultEventArgs e);
         public event ResultHandler resultEvent;
+        public delegate void UploadHandler(UploadEventArgs e);
+        public event UploadHandler uploadEvent;
 
         public Server(int port)
 		{
@@ -161,6 +163,16 @@ namespace CommAPI
 		private void doSaveAssembly(Payload payload)
 		{
             commUtil.storeAssembly(payload.assemblyName, payload.assemblyBytes, payload.isAppend, payload.remainingPayloads);
+
+            if(payload.remainingPayloads == 0 && !payload.isAppend)
+            {
+                UploadEventArgs args = new UploadEventArgs()
+                {
+                    FromClientId = payload.clientId,
+                    AssemblyName = payload.assemblyName
+                };
+                uploadEvent(args);
+            }
         }
 
 		private void doRegisterAssembly(Payload payload, NetworkStream networkstream)
@@ -340,6 +352,12 @@ namespace CommAPI
         public string FromClientId { get; set; }
         public string ToClientId { get; set; }
         public string RunId { get; set; }
+    }
+
+    public class UploadEventArgs : EventArgs
+    {
+        public string FromClientId { get; set; }
+        public string AssemblyName { get; set; }
     }
 
 }

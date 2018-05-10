@@ -25,6 +25,9 @@ namespace vComputeServer
         {
             Server server = new Server(8080);
             Subscribe(server);
+            SetText("Server Started", MessageType.Success);
+            btnServerStart.BackColor = Color.Green;
+            btnServerStart.Enabled = false;
         }
 
         public void Subscribe(Server s)
@@ -33,6 +36,7 @@ namespace vComputeServer
             s.updateStatusEvent += new Server.UpdateStatusHandler(OnUpdateStatus);
             s.executeEvent += new Server.ExecuteHandler(OnExecuteStatus);
             s.resultEvent += new Server.ResultHandler(OnResultStatus);
+            s.uploadEvent += new Server.UploadHandler(OnUploadAssembly);
         }
         private void OnClientRegistration(RegisterClientEventArgs e)
         {
@@ -40,7 +44,7 @@ namespace vComputeServer
         }
         private void OnUpdateStatus(UpdateStatusEventArgs e)
         {
-            SetText(string.Format("Recieved Status Update from {0}. Load is {1}", e.ClientId, e.load), MessageType.Information);
+            //SetText(string.Format("Recieved Status Update from {0}. Load is {1}", e.ClientId, e.load), MessageType.Information);
         }
 
         private void OnExecuteStatus(ExectueEventArgs e)
@@ -51,6 +55,11 @@ namespace vComputeServer
         private void OnResultStatus(ResultEventArgs e)
         {
             SetText(string.Format("Recieved Result  from {0} for {1}", e.FromClientId, e.ToClientId), MessageType.Success);
+        }
+
+        private void OnUploadAssembly(UploadEventArgs e)
+        {
+            SetText(string.Format("Assembly {0} saved on server recieved from {1}", e.AssemblyName, e.FromClientId), MessageType.Success);
         }
 
         private void Server_form_Load(object sender, EventArgs e)

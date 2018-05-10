@@ -25,8 +25,8 @@ namespace CommAPI
 		private int runID;
 		private Dictionary<string, Payload> execData;
         public EventArgs e = null;
-        //public delegate void RegisterClientHandlerFromClient(Server sender, RegisterClientEventArgs e);
-        //public event RegisterClientHandlerFromClient registerClientEvent;
+        public delegate void RegisterClientHandlerFromClient(RegisterClientEventArgs e);
+        public event RegisterClientHandlerFromClient registerClientEvent;
 
         //client constructor
         public Client(string host,int port)
@@ -92,7 +92,9 @@ namespace CommAPI
         private void setClientID(Payload payload)
         {
             clientId = payload.clientId;
-
+            RegisterClientEventArgs args = new RegisterClientEventArgs();
+            args.ClientId = clientId;
+            registerClientEvent(args);
         }
 
 		public object requestTask(string assemblyName,object param)
