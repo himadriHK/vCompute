@@ -190,7 +190,11 @@ namespace CommAPI
 
 		private void executeTask(Payload incoming)
 		{
-			if (execData.ContainsKey(incoming.runId))
+            if (!commUtil.codeLoader.codeDictionary.containsAssembly(incoming.assemblyName))
+                downloadAssembly(incoming.assemblyName);
+            while (!commUtil.codeLoader.codeDictionary.containsAssembly(incoming.assemblyName)) ;
+
+            if (execData.ContainsKey(incoming.runId))
 			{
 				lock (execData)
 				{

@@ -17,7 +17,7 @@ namespace CommAPI
 	public class Common
 	{
 		
-		private const int payloadSize = 3072;
+		private const int payloadSize = 5120;
 		private const double assemblySize = 200.0;
 		private Dictionary<string, Payload> TaskList;
 		public Loader codeLoader;
@@ -75,8 +75,16 @@ namespace CommAPI
 		public Payload preparePayload(string payload)
 		{
             string temp = payload.Trim('\0').Trim('a');
-
-			return new JavaScriptSerializer().Deserialize<Payload>(temp);
+            try
+            {
+                return new JavaScriptSerializer().Deserialize<Payload>(temp);
+            }
+            catch(Exception ex)
+            {
+                Payload output = new Payload();
+                output.command = CommandType.NOTHING;
+                return output;
+            }
 		}
 
 		public void sendPacket(NetworkStream stream,Payload payload)
@@ -182,22 +190,16 @@ namespace CommAPI
 
 		public Payload getPacket(NetworkStream stream)
 		{
-			//lock(stream)
-			{
 				byte[] buffer = new byte[payloadSize];
                 int readBytes = 0;
-
-                // while (readBytes < payloadSize)
-                // {
-                //     readBytes += stream.Read(buffer, readBytes, 512);
-                //     while (!stream.DataAvailable) ;
-                // }
-
                 readBytes=stream.Read(buffer, 0, payloadSize);
-
-                string serializedData = Encoding.UTF8.GetString(buffer);
-				Payload output = preparePayload(serializedData);
-                if (output == null)
+                Payload output;
+                if (readBytes == payloadSize)
+                {
+                    string serializedData = Encoding.UTF8.GetString(buffer);
+                    output = preparePayload(serializedData);
+                }
+                else
                 {
                     Debug.Print("*******************NULLLL******");
                     output = new Payload();
@@ -206,7 +208,6 @@ namespace CommAPI
 				if (output!=null && output.command != CommandType.STATUS)
 					Debug.Print("Receiving " + Enum.GetName(typeof(CommandType), output.command));
 				return output;
-			}
 		}
 	}
 
