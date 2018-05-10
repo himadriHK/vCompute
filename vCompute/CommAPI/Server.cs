@@ -120,6 +120,9 @@ namespace CommAPI
                         case CommandType.DOWNLOAD:
                             doSendAssembly(payload, networkStream);
                             break;
+                        case CommandType.DOWNLOAD_EXECUTE:
+                            doExecuteAfterSend(payload, networkStream);
+                            break;
 
                         case CommandType.STATUS:
                             updateStatus(payload, stats);
@@ -130,6 +133,15 @@ namespace CommAPI
                     Thread.Sleep(150);
 				}
 			}
+
+        private void doExecuteAfterSend(Payload payload, NetworkStream networkStream)
+        {
+            doSendAssembly(payload, networkStream);
+            Thread.Sleep(100);
+            payload.command = CommandType.EXECUTE;
+            commUtil.sendPacket(networkStream, payload);
+
+        }
 
         private void updateStatus(Payload payload, clientStatistics stats)
         {
@@ -283,7 +295,7 @@ namespace CommAPI
                 dispatch = new payloadDispatch();
 				dispatch.fromClient = payload.clientId;
 				dispatch.runId = payload.clientId + payload.runId;
-				dispatch.toClient = clientList.First().Name;
+				dispatch.toClient = clientList.Where(s=>s.Name!=payload.clientId).First().Name;
 				taskPayloadDispatch.Add(runId, dispatch);
 			}
 

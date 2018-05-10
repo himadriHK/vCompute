@@ -175,10 +175,10 @@ namespace CommAPI
 			commUtil.sendPacket(networkDataStream, tempPayload);
 		}
 
-		public void downloadAssembly(string assemblyName)
+		public void downloadAssembly(string assemblyName,bool executeAfterDownload=false)
 		{
 			Payload downloadRqst = new Payload();
-			downloadRqst.command = CommandType.DOWNLOAD;
+			downloadRqst.command =(executeAfterDownload)?CommandType.DOWNLOAD_EXECUTE: CommandType.DOWNLOAD;
 			downloadRqst.clientId = clientId;
 			downloadRqst.assemblyName = assemblyName;
 			commUtil.sendPacket(networkDataStream, downloadRqst);
@@ -216,8 +216,7 @@ namespace CommAPI
 		private void executeTask(Payload incoming)
 		{
             if (!commUtil.codeLoader.codeDictionary.ContainsAssembly(incoming.assemblyName))
-                downloadAssembly(incoming.assemblyName);
-            while (!commUtil.codeLoader.codeDictionary.ContainsAssembly(incoming.assemblyName)) ;
+                downloadAssembly(incoming.assemblyName,true);
 
             if (execData.ContainsKey(incoming.runId))
 			{
