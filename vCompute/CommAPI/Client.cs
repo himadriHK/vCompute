@@ -86,6 +86,7 @@ namespace CommAPI
                             break;
 					}
 				}
+                Thread.Sleep(150);
 			}
 		}
 
