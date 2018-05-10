@@ -19,7 +19,8 @@ namespace vComputeClient
 	public partial class Form1 : Form
 	{
         Client client;
-		public Form1()
+        delegate void StringArgReturningVoidDelegate(string text);
+        public Form1()
 		{
 			InitializeComponent();
 		}
@@ -47,6 +48,9 @@ namespace vComputeClient
         {
             client = new Client(TxtHostName.Text, 8080);
             client.registerClient();
+            Subscribe(client);
+            TxtHostName.Enabled = false;
+            btnStartClient.Enabled = false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -77,15 +81,30 @@ namespace vComputeClient
             if (TxtHostName.Text.Trim().Length > 0)
                 btnStartClient.Enabled = true;
         }
-        public void Subscribe(Server s)
+        public void Subscribe(Client c)
         {
-            s.registerClientEvent += new Server.RegisterClientHandler(OnClientRegistration);
+            c.registerClientEvent += new Client.RegisterClientHandlerFromClient(OnClientRegistration);
         }
         private void OnClientRegistration(RegisterClientEventArgs e)
         {
-            lblclientID.Text = e.ClientId;
-            TxtHostName.Enabled = false;
-            btnStartClient.Enabled = false;
+            SetText(e.ClientId);
+            
+        }
+
+        private void SetText(string text)
+        {
+            // InvokeRequired required compares the thread ID of the  
+            // calling thread to the thread ID of the creating thread.  
+            // If these threads are different, it returns true.  
+            if (this.lblclientID.InvokeRequired)
+            {
+                StringArgReturningVoidDelegate d = new StringArgReturningVoidDelegate(SetText);
+                this.Invoke(d, new object[] { text});
+            }
+            else
+            {
+                this.lblclientID.Text = text;
+            }
         }
     }
 }
