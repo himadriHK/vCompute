@@ -30,6 +30,8 @@ namespace CommAPI
         public event ResultHandler resultEvent;
         public delegate void UploadHandler(UploadEventArgs e);
         public event UploadHandler uploadEvent;
+        public delegate void DisconnectHandler(DisconnectEventArgs e);
+        public event DisconnectHandler DisconnectEvent;
 
         public Server(int port)
 		{
@@ -63,6 +65,7 @@ namespace CommAPI
 			NetworkStream networkStream = client.GetStream();
             clientStatistics stats = new clientStatistics(clientList);
             Queue<Payload> payloadQueue = new Queue<Payload>();
+            string ClientID="Not Registered";
             lock (clientList)
             {
                 clientList.Add(stats);
@@ -71,6 +74,15 @@ namespace CommAPI
 
             while (true)
 			{
+                if (!client.Connected)
+                {
+                    var e = DisconnectEvent;
+                    DisconnectEventArgs args = new DisconnectEventArgs();
+                    args.ClientId = ClientID;
+                    if (e != null)
+                        e.Invoke(args);
+                    break;
+                }
                 while (networkStream.DataAvailable)
                 {
                     byte[] buffer = new byte[commUtil.payloadSize];
@@ -105,7 +117,7 @@ namespace CommAPI
                             break;
 
                         case CommandType.REGISTER_CLIENT:
-                            doRegisterClient(payload, networkStream);
+                            ClientID=doRegisterClient(payload, networkStream);
                             break;
 
                         case CommandType.REGISTER_ASSEMBLY:
@@ -210,7 +222,7 @@ namespace CommAPI
             commUtil.StoreAssembly(payload.assemblyName, new byte[0], false,0);
         }
 
-        private void doRegisterClient(Payload payload, NetworkStream networkStream)
+        private string doRegisterClient(Payload payload, NetworkStream networkStream)
         {
             string ClientId = "Client" + ClientNo;
             Payload outputClientIdPayLoad = new Payload();
@@ -231,22 +243,23 @@ namespace CommAPI
 				ClientNo++;
 			}
 
-            args.ClientId = ClientId+" second";
-            if (e!=null)
-            e.Invoke(args);
-
+            return ClientId;
         }
 
 		private void sendPacketsToClient(string clientId, NetworkStream networkStream)
 		{
 			var Q = taskPayLoad[clientId];
-			while(true)
-//			lock (Q)
-			{
-                while(Q.Count>0)
-					commUtil.sendPacket(networkStream,Q.Dequeue());
+            while (true)
+            {
+                if (networkStream == null)
+                    break;
+
+                lock (Q)
+                    while (Q.Count > 0)
+                        commUtil.sendPacket(networkStream, Q.Dequeue());
                 Thread.Sleep(300);
-			}
+            }
+			
 		}
 
 		private void sendToResultQueue(Payload payload)
@@ -363,10 +376,7 @@ namespace CommAPI
 			return Load.CompareTo(other.Load);
 		}
 	}
-    public class RegisterClientEventArgs : EventArgs
-    {
-        public string ClientId { get; set; }
-    }
+
 
     public class UpdateStatusEventArgs : EventArgs
     {

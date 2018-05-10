@@ -93,14 +93,19 @@ namespace CommAPI
 
 		public void sendPacket(NetworkStream stream,Payload payload)
 		{
-			string serializedData = preparePayload(payload);
-            if (string.IsNullOrEmpty(serializedData.Trim('a')))
-                return;
+            try
+            {
+                string serializedData = preparePayload(payload);
+                if (string.IsNullOrEmpty(serializedData.Trim('a')))
+                    return;
 
-			byte[] data = Encoding.UTF8.GetBytes(serializedData);
-			stream.Write(data, 0, payloadSize);
-			if(payload.command!=CommandType.STATUS)
-			Debug.Print("Sending " + Enum.GetName(typeof(CommandType), payload.command));
+                byte[] data = Encoding.UTF8.GetBytes(serializedData);
+                stream.Write(data, 0, payloadSize);
+                if (payload.command != CommandType.STATUS)
+                    Debug.Print("Sending " + Enum.GetName(typeof(CommandType), payload.command));
+            }
+            catch(ObjectDisposedException ex)
+            { }
 		}
 
 		public byte[][] splitBytes(byte[] assemblyBytes)
@@ -143,7 +148,7 @@ namespace CommAPI
 					continue;
 
 				if (timer.Elapsed > span)
-					return "";
+					return "Timed Out";
 
 				if (resultPayload.isAppend == false && resultPayload.remainingPayloads == 0 && timer.Elapsed <= span)
 				{
@@ -276,4 +281,15 @@ namespace CommAPI
 			return output;
 		}
 	}
+
+    public class RegisterClientEventArgs : EventArgs
+    {
+        public string ClientId { get; set; }
+    }
+
+    public class DisconnectEventArgs : EventArgs
+    {
+        public string ClientId { get; set; }
+
+    }
 }

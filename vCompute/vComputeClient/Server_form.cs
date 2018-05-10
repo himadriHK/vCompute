@@ -37,7 +37,14 @@ namespace vComputeServer
             s.executeEvent += new Server.ExecuteHandler(OnExecuteStatus);
             s.resultEvent += new Server.ResultHandler(OnResultStatus);
             s.uploadEvent += new Server.UploadHandler(OnUploadAssembly);
+            s.DisconnectEvent += S_DisconnectEvent;
         }
+
+        private void S_DisconnectEvent(DisconnectEventArgs e)
+        {
+            SetText(string.Format("Client with id {0} Disconnected", e.ClientId),MessageType.Error);
+        }
+
         private void OnClientRegistration(RegisterClientEventArgs e)
         {
             SetText(string.Format("New Client {0} has been registered", e.ClientId), MessageType.Success);

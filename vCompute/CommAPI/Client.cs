@@ -27,6 +27,8 @@ namespace CommAPI
         public EventArgs e = null;
         public delegate void RegisterClientHandlerFromClient(RegisterClientEventArgs e);
         public event RegisterClientHandlerFromClient registerClientEvent;
+        public delegate void DisconnectHandler(DisconnectEventArgs e);
+        public event DisconnectHandler DisconnectEvent;
 
         //client constructor
         public Client(string host,int port)
@@ -54,59 +56,82 @@ namespace CommAPI
 			}
 		}
 
+        public void Disconnect()
+        {
+            clientInstance.Close();
+        }
+
 		private void serverMessageHandler(object networkDataStream)
 		{
             Queue<Payload> payloadQueue = new Queue<Payload>();
             NetworkStream networkStream = (NetworkStream)networkDataStream;
-            while (true)
-			{
-                while (networkStream.DataAvailable)
+            try
+            {
+                while (true)
                 {
-                    byte[] buffer = new byte[commUtil.payloadSize];
-                    int readBytes = 0;
-                    readBytes = networkStream.Read(buffer, 0, commUtil.payloadSize);
-                    Payload output = null;
-                    if (readBytes == commUtil.payloadSize)
+                    if (networkStream == null)
                     {
-                        string serializedData = Encoding.UTF8.GetString(buffer);
-                        output = commUtil.preparePayload(serializedData);
-                        payloadQueue.Enqueue(output);
+                        var e = DisconnectEvent;
+                        DisconnectEventArgs args = new DisconnectEventArgs();
+                        if (e != null)
+                            e.Invoke(args);
+                        break;
                     }
-                    if (output != null && output.command != CommandType.STATUS)
-                        Debug.Print("Receiving " + Enum.GetName(typeof(CommandType), output.command));
-                }
-                while (payloadQueue.Count != 0)
-                {
-                    Payload payload = null;
-                    if (payloadQueue != null && payloadQueue.Count > 0)
-                        payload = payloadQueue.Dequeue();
-
-                    if (payload.command != CommandType.STATUS)
-                        Debug.Print("Printing Client " + payload.command);
-                    switch (payload.command)
+                    while (networkStream.DataAvailable)
                     {
-                        case CommandType.DOWNLOAD:
-                        case CommandType.APPEND_ASSEMBLY:
-                            commUtil.StoreAssembly(payload.assemblyName, payload.assemblyBytes, payload.isAppend, payload.remainingPayloads);
-                            break;
-
-                        case CommandType.EXECUTE:
-                        case CommandType.APPEND_EXECUTE:
-                            executeTask(payload);
-                            break;
-
-                        case CommandType.RESULT:
-                        case CommandType.APPEND_RESULT:
-                            commUtil.storeResult(payload.assemblyName, payload.runId, payload.jsonOutput, payload.isAppend, payload.remainingPayloads);
-                            break;
-
-                        case CommandType.CLIENT_REGISTRTION:
-                            setClientID(payload);
-                            break;
+                        byte[] buffer = new byte[commUtil.payloadSize];
+                        int readBytes = 0;
+                        readBytes = networkStream.Read(buffer, 0, commUtil.payloadSize);
+                        Payload output = null;
+                        if (readBytes == commUtil.payloadSize)
+                        {
+                            string serializedData = Encoding.UTF8.GetString(buffer);
+                            output = commUtil.preparePayload(serializedData);
+                            payloadQueue.Enqueue(output);
+                        }
+                        if (output != null && output.command != CommandType.STATUS)
+                            Debug.Print("Receiving " + Enum.GetName(typeof(CommandType), output.command));
                     }
+                    while (payloadQueue.Count != 0)
+                    {
+                        Payload payload = null;
+                        if (payloadQueue != null && payloadQueue.Count > 0)
+                            payload = payloadQueue.Dequeue();
+
+                        if (payload.command != CommandType.STATUS)
+                            Debug.Print("Printing Client " + payload.command);
+                        switch (payload.command)
+                        {
+                            case CommandType.DOWNLOAD:
+                            case CommandType.APPEND_ASSEMBLY:
+                                commUtil.StoreAssembly(payload.assemblyName, payload.assemblyBytes, payload.isAppend, payload.remainingPayloads);
+                                break;
+
+                            case CommandType.EXECUTE:
+                            case CommandType.APPEND_EXECUTE:
+                                executeTask(payload);
+                                break;
+
+                            case CommandType.RESULT:
+                            case CommandType.APPEND_RESULT:
+                                commUtil.storeResult(payload.assemblyName, payload.runId, payload.jsonOutput, payload.isAppend, payload.remainingPayloads);
+                                break;
+
+                            case CommandType.CLIENT_REGISTRTION:
+                                setClientID(payload);
+                                break;
+                        }
+                    }
+                    Thread.Sleep(150);
                 }
-                Thread.Sleep(150);
-			}
+            }
+            catch(ObjectDisposedException)
+            {
+                var e = DisconnectEvent;
+                DisconnectEventArgs args = new DisconnectEventArgs();
+                if (e != null)
+                    e.Invoke(args);
+            }
 		}
 
         private void setClientID(Payload payload)
@@ -283,6 +308,9 @@ namespace CommAPI
 		{
 			while(true)
 			{
+                if (networkDataStream == null)
+                    break;
+
 				Payload tempLoad = new Payload();
 				float[] perfData = getPerfCounter();
 				tempLoad.clientId = clientId;
@@ -320,4 +348,5 @@ namespace CommAPI
 		}
 
 	}
+
 }

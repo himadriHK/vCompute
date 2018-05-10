@@ -106,5 +106,10 @@ namespace vComputeClient
                 this.lblclientID.Text = text;
             }
         }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            client.Disconnect();
+        }
     }
 }
