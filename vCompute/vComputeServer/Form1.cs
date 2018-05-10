@@ -71,7 +71,7 @@ namespace vComputeClient
 
         private void button2_Click(object sender, EventArgs e)
         {
-            client.downloadAssembly(textBox2.Text);
+            //client.downloadAssembly(textBox2.Text);
             string paramValue = Microsoft.VisualBasic.Interaction.InputBox("Enter Parameter Value", "Input");
             MessageBox.Show(client.requestTask(textBox2.Text, paramValue).ToString());
         }
