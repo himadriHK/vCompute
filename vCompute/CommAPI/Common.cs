@@ -13,15 +13,15 @@ using System.Runtime.Remoting;
 
 namespace CommAPI
 {
-	public enum CommandType { REQUEST = 101,APPEND_REQUEST, DOWNLOAD, EXECUTE, APPEND_EXECUTE, DELETE, PING, REGISTER_CLIENT, REGISTER_ASSEMBLY, UPLOAD_ASSEMBLY,RESULT, APPEND_ASSEMBLY,APPEND_RESULT, STATUS, DISCOVERY, CLIENT_REGISTRTION }
+	public enum CommandType { REQUEST = 101,APPEND_REQUEST, DOWNLOAD, EXECUTE, APPEND_EXECUTE, DELETE, PING, REGISTER_CLIENT, REGISTER_ASSEMBLY, UPLOAD_ASSEMBLY,RESULT, APPEND_ASSEMBLY,APPEND_RESULT, STATUS, DISCOVERY, CLIENT_REGISTRTION,NOTHING }
 	public class Common
 	{
 		
-		private const int payloadSize = 2048;
+		private const int payloadSize = 3072;
 		private const double assemblySize = 500.0;
 		private Dictionary<string, Payload> TaskList;
 		public Loader codeLoader;
-		private int timeOut=30;
+		private int timeOut=120;
 
 		public Common(string codeBinaryFilePath)
 		{
@@ -70,18 +70,23 @@ typeof(Sandboxer).FullName);
 
 		public string preparePayload(Payload payload)
 		{
-			return new JavaScriptSerializer().Serialize(payload).PadRight(payloadSize);
+			return new JavaScriptSerializer().Serialize(payload).PadRight(payloadSize,'a');
 		}
 
 		public Payload preparePayload(string payload)
 		{
-			return new JavaScriptSerializer().Deserialize<Payload>(payload.TrimEnd());
+            string temp = payload.Trim('\0').Trim('a');
+
+			return new JavaScriptSerializer().Deserialize<Payload>(temp);
 		}
 
 		public void sendPacket(NetworkStream stream,Payload payload)
 		{
 			string serializedData = preparePayload(payload);
-			byte[] data = Encoding.ASCII.GetBytes(serializedData);
+            if (string.IsNullOrEmpty(serializedData.Trim('a')))
+                return;
+
+			byte[] data = Encoding.UTF8.GetBytes(serializedData);
 			stream.Write(data, 0, payloadSize);
 			if(payload.command!=CommandType.STATUS)
 			Debug.Print("Sending " + Enum.GetName(typeof(CommandType), payload.command));
@@ -181,10 +186,25 @@ typeof(Sandboxer).FullName);
 			//lock(stream)
 			{
 				byte[] buffer = new byte[payloadSize];
-				stream.Read(buffer, 0, payloadSize);
-				string serializedData = Encoding.ASCII.GetString(buffer);
+                int readBytes = 0;
+
+                // while (readBytes < payloadSize)
+                // {
+                //     readBytes += stream.Read(buffer, readBytes, 512);
+                //     while (!stream.DataAvailable) ;
+                // }
+
+                readBytes=stream.Read(buffer, 0, payloadSize);
+
+                string serializedData = Encoding.UTF8.GetString(buffer);
 				Payload output = preparePayload(serializedData);
-				if (output.command != CommandType.STATUS)
+                if (output == null)
+                {
+                    Debug.Print("*******************NULLLL******");
+                    output = new Payload();
+                    output.command = CommandType.NOTHING;
+                }
+				if (output!=null && output.command != CommandType.STATUS)
 					Debug.Print("Receiving " + Enum.GetName(typeof(CommandType), output.command));
 				return output;
 			}

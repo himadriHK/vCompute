@@ -9,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdhocTests", "AdhocTests\Ad
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleClass", "SimpleClass\SimpleClass.csproj", "{9C870637-1F2B-4610-9F34-5D56EBA819D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vComputeServer", "vComputeServer\vComputeServer.csproj", "{95666AC8-6777-493B-84A7-BBF37D4449B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vComputeClient", "vComputeServer\vComputeClient.csproj", "{95666AC8-6777-493B-84A7-BBF37D4449B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vComputeClient", "vComputeClient\vComputeClient.csproj", "{B57DA644-BE4F-4EA5-B8C7-AB3C140EDB49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vComputeServer", "vComputeClient\vComputeServer.csproj", "{B57DA644-BE4F-4EA5-B8C7-AB3C140EDB49}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommAPI", "CommAPI\CommAPI.csproj", "{73AB48E0-98BA-4165-B058-8D1BBB096432}"
 EndProject

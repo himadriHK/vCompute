@@ -50,8 +50,15 @@ namespace CommAPI
 		{
 			TcpClient client = (TcpClient)clientInfo;
 			NetworkStream networkStream = client.GetStream();
+            clientStatistics stats = new clientStatistics(clientList);
 
-			while (true)
+            lock (clientList)
+            {
+                clientList.Add(stats);
+                clientList.Sort();
+            }
+
+            while (true)
 			{
 				if (networkStream.DataAvailable)
 				{
@@ -85,13 +92,27 @@ namespace CommAPI
 							doSendAssembly(payload, networkStream);
 						break;
 
-					}
+                        case CommandType.STATUS:
+                            updateStatus(payload, stats);
+                        break;
+                    }
 					Console.WriteLine(payload.clientId + " " + payload.command + " " + payload.cpuUsage + " " + payload.memUsage);
+                    Thread.Sleep(2000);
 				}
 			}
 		}
 
-		private void doSendAssembly(Payload payload, NetworkStream networkDataStream)
+        private void updateStatus(Payload payload, clientStatistics stats)
+        {
+            if (!taskPayLoad.ContainsKey(payload.clientId))
+                return;
+
+            double load = (payload.cpuUsage + payload.memUsage) / 2;
+            stats.Load = (stats.Load+ load)/2;
+            stats.Name = payload.clientId;
+        }
+
+        private void doSendAssembly(Payload payload, NetworkStream networkDataStream)
 		{
             byte[] outputAssembly = commUtil.readAssembly(payload.assemblyName);
 
@@ -135,15 +156,17 @@ namespace CommAPI
         {
             string ClientId = "Client" + ClientNo;
             Payload outputClientIdPayLoad = new Payload();
+            outputClientIdPayLoad.command = CommandType.CLIENT_REGISTRTION;
             outputClientIdPayLoad.clientId = ClientId;
-	        if (!taskPayLoad.ContainsKey(outputClientIdPayLoad.clientId))
+            commUtil.sendPacket(networkStream, outputClientIdPayLoad);
+            if (!taskPayLoad.ContainsKey(outputClientIdPayLoad.clientId))
 	        {
 				taskPayLoad.Add(outputClientIdPayLoad.clientId, new Queue<Payload>());
 				Thread newClientThreadStart = new Thread(()=>sendPacketsToClient(ClientId,networkStream));
 				newClientThreadStart.Start();
 				ClientNo++;
 			}
-			commUtil.sendPacket(networkStream, outputClientIdPayLoad);
+			
         }
 
 		private void sendPacketsToClient(string clientId, NetworkStream networkStream)
@@ -152,8 +175,8 @@ namespace CommAPI
 			while(true)
 			lock (Q)
 			{
-				foreach(Payload p in Q)
-					commUtil.sendPacket(networkStream,p);
+                while(Q.Count>0)
+					commUtil.sendPacket(networkStream,Q.Dequeue());
 			}
 		}
 
@@ -188,6 +211,7 @@ namespace CommAPI
 			}
 			else
 			{
+                dispatch = new payloadDispatch();
 				dispatch.fromClient = payload.clientId;
 				dispatch.runId = payload.clientId + payload.runId;
 				dispatch.toClient = clientList.First().Name;
