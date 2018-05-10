@@ -41,20 +41,22 @@ namespace vComputeServer
             }
             else
                 return File.ReadAllBytes(result.PathToAssembly);
-  }
+        }
 
         private void btnStartClient_Click(object sender, EventArgs e)
         {
-            client = new Client("localhost", 8080);
+            client = new Client(TxtHostName.Text, 8080);
             client.registerClient();
             Thread.Sleep(1000);
             lblclientID.Text = client.clientId;
+            TxtHostName.Enabled = false;
+            btnStartClient.Enabled = false;
 
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            btnStartClient.Enabled = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -73,6 +75,12 @@ namespace vComputeServer
             client.downloadAssembly(textBox2.Text);
             string paramValue = Microsoft.VisualBasic.Interaction.InputBox("Enter Parameter Value", "Input");
             MessageBox.Show(client.requestTask(textBox2.Text, paramValue).ToString());
+        }
+
+        private void TxtHostName_TextChanged(object sender, EventArgs e)
+        {
+            if (TxtHostName.Text.Trim().Length > 0)
+                btnStartClient.Enabled = true;
         }
     }
 }
