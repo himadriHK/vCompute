@@ -215,10 +215,13 @@ namespace CommAPI
 
 		private void executeTask(Payload incoming)
 		{
-            if (!commUtil.codeLoader.codeDictionary.ContainsAssembly(incoming.assemblyName))
-                downloadAssembly(incoming.assemblyName,true);
+			if (!commUtil.codeLoader.codeDictionary.ContainsAssembly(incoming.assemblyName))
+			{
+				downloadAssembly(incoming.assemblyName, true);
+				return;
+			}
 
-            if (execData.ContainsKey(incoming.runId))
+			if (execData.ContainsKey(incoming.runId))
 			{
 				lock (execData)
 				{
