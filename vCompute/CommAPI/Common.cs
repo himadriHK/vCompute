@@ -18,10 +18,10 @@ namespace CommAPI
 	{
 		
 		private const int payloadSize = 3072;
-		private const double assemblySize = 500.0;
+		private const double assemblySize = 200.0;
 		private Dictionary<string, Payload> TaskList;
 		public Loader codeLoader;
-		private int timeOut=120;
+		private int timeOut=60;
 
 		public Common(string codeBinaryFilePath)
 		{
@@ -49,8 +49,7 @@ namespace CommAPI
 			if (assemblyName.ToLower() == "discovery")
 				return string.Join(",", codeLoader.codeDictionary.getAssemblyList());
 
-			ObjectHandle handle = Activator.CreateInstanceFrom(tempDomain, typeof(Sandboxer).Assembly.ManifestModule.FullyQualifiedName,
-typeof(Sandboxer).FullName);
+			ObjectHandle handle = Activator.CreateInstanceFrom(tempDomain, typeof(Sandboxer).Assembly.ManifestModule.FullyQualifiedName,typeof(Sandboxer).FullName);
 
 			Sandboxer newDomainInstance = (Sandboxer)handle.Unwrap();
 

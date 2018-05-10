@@ -97,7 +97,7 @@ namespace CommAPI
                         break;
                     }
 					Console.WriteLine(payload.clientId + " " + payload.command + " " + payload.cpuUsage + " " + payload.memUsage);
-                    Thread.Sleep(2000);
+                    Thread.Sleep(150);
 				}
 			}
 		}

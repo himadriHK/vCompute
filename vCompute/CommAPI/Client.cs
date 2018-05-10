@@ -258,7 +258,7 @@ namespace CommAPI
 				tempLoad.memUsage = perfData[1];
 				tempLoad.clientTime = DateTime.Now;
 				commUtil.sendPacket(networkDataStream, tempLoad);
-				Thread.Sleep(1000);
+				Thread.Sleep(50);
 			}
 		}
 
@@ -277,7 +277,7 @@ namespace CommAPI
 
 
 			dynamic cpufirstValue = cpuCounter.NextValue();
-			System.Threading.Thread.Sleep(1000);
+			System.Threading.Thread.Sleep(50);
 
 			dynamic cpusecondValue = cpuCounter.NextValue();
 			dynamic ramsecondValue = ramCounter.NextValue();
