@@ -33,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -80,6 +81,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CodeLoader\CodeLoader.csproj">
+      <Project>{5acd6178-af00-4e39-a09f-f0c52c62cfc1}</Project>
+      <Name>CodeLoader</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CommAPI\CommAPI.csproj">
       <Project>{73AB48E0-98BA-4165-B058-8D1BBB096432}</Project>
       <Name>CommAPI</Name>

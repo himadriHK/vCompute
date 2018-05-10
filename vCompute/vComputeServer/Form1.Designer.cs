@@ -38,6 +38,9 @@
             this.btnStartClient = new System.Windows.Forms.Button();
             this.lblclienttext = new System.Windows.Forms.Label();
             this.lblclientID = new System.Windows.Forms.Label();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.button2 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label4
@@ -89,8 +92,9 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(227, 23);
             this.button1.TabIndex = 8;
-            this.button1.Text = "Queue Task";
+            this.button1.Text = "Upload Assembly";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // textBox1
             // 
@@ -128,11 +132,40 @@
             this.lblclientID.Size = new System.Drawing.Size(0, 13);
             this.lblclientID.TabIndex = 16;
             // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(12, 526);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(314, 20);
+            this.textBox2.TabIndex = 17;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(12, 510);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(82, 13);
+            this.label5.TabIndex = 18;
+            this.label5.Text = "Assembly Name";
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(12, 592);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(227, 23);
+            this.button2.TabIndex = 19;
+            this.button2.Text = "Request Task";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(843, 645);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.textBox2);
             this.Controls.Add(this.lblclientID);
             this.Controls.Add(this.lblclienttext);
             this.Controls.Add(this.btnStartClient);
@@ -146,6 +179,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Form1";
             this.Text = "vCompute Client";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -163,6 +197,9 @@
         private System.Windows.Forms.Button btnStartClient;
         private System.Windows.Forms.Label lblclienttext;
         private System.Windows.Forms.Label lblclientID;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button button2;
     }
 }
 
